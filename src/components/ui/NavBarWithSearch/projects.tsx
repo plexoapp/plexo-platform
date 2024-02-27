@@ -1,9 +1,10 @@
-import { Navbar, NavLink, Skeleton, Stack, useMantineTheme } from "@mantine/core";
+import { Button, Navbar, NavLink, Skeleton, Stack, useMantineTheme } from "@mantine/core";
 import { Rocket } from "tabler-icons-react";
 import router from "next/router";
 
 import { Project } from "lib/types";
 import { usePlexoContext } from "context/PlexoContext";
+import { IconSparkles } from "@tabler/icons-react";
 
 const ProjectsList = () => {
   const theme = useMantineTheme();

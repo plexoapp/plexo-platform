@@ -171,7 +171,7 @@ export const StatusCheckboxGroup = ({ statusFilters, setStatusFilters }: StatusC
 
 type GenericStatusMenuProps = {
   children: React.ReactNode;
-  onSelect?: (priority: TaskStatus) => void;
+  onSelect?: (status: TaskStatus) => void;
   task?: TaskById | Task | undefined;
 };
 

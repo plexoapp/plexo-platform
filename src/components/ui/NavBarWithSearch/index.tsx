@@ -14,7 +14,7 @@ import {
 } from "@mantine/core";
 
 import router from "next/router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Edit, Plus, Bulb, Checkbox, Search } from "tabler-icons-react";
 
 import NewProject from "../Project/newProject";
@@ -26,6 +26,8 @@ import { spotlight } from "@mantine/spotlight";
 import { ProjectIcon } from "../Task/project";
 import { TeamIcon } from "../Project/team";
 import { usePlexoContext } from "context/PlexoContext";
+import { IconSparkles } from "@tabler/icons-react";
+import DesignProject from "../Project/DesignProject/designProject";
 
 const useStyles = createStyles(theme => ({
   navbar: {
@@ -119,9 +121,10 @@ export function NavbarSearch({ onNewTask, openedNav, setOpenedNav }: NavBarWithS
   const { classes } = useStyles();
   const [section, setSection] = useState<"projects" | "teams">("projects");
   const [newProjectOpened, setNewProjectOpened] = useState(false);
+  const [designProjectOpened, setDesignProjectOpened] = useState(false);
   const [newTeamOpened, setNewTeamOpened] = useState(false);
 
-  const { userData, isLoadingUser, plexoAPIEndpoint } = usePlexoContext();
+  const { userData, isLoadingUser, plexoAPIEndpoint, authCookie } = usePlexoContext();
 
   const mainLinks = links.map(link => (
     <UnstyledButton
@@ -141,9 +144,21 @@ export function NavbarSearch({ onNewTask, openedNav, setOpenedNav }: NavBarWithS
     </UnstyledButton>
   ));
 
+  useEffect(() => {
+    const isShown = localStorage.getItem("modalShownBefore");
+    if (!isShown && authCookie) {
+      setDesignProjectOpened(true);
+      localStorage.setItem("modalShownBefore", "true");
+    }
+  }, []);
+
   return (
     <>
       <NewProject newProjectOpened={newProjectOpened} setNewProjectOpened={setNewProjectOpened} />
+      <DesignProject
+        designProjectOpened={designProjectOpened}
+        setDesignProjectOpened={setDesignProjectOpened}
+      />
       <NewTeam newTeamOpened={newTeamOpened} setNewTeamOpened={setNewTeamOpened} />
       <Navbar
         width={{ sm: 300 }}
@@ -174,6 +189,15 @@ export function NavbarSearch({ onNewTask, openedNav, setOpenedNav }: NavBarWithS
             </ActionIcon>
           </Group>
           <div>{mainLinks}</div>
+          <Button
+            /* compact */
+            w={"100%"}
+            variant="light"
+            leftIcon={<IconSparkles size={16} />}
+            onClick={() => setDesignProjectOpened(true)}
+          >
+            Design your project
+          </Button>
         </Navbar.Section>
         <Navbar.Section className={classes.section} p="sm">
           <Group position="apart" mb={"xs"}>
