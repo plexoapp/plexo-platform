@@ -4,6 +4,7 @@ query User {
     name
     email
     photoUrl
+    role
   }
 }
 
