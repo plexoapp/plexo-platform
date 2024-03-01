@@ -1136,7 +1136,14 @@ export type UserQueryVariables = Exact<{ [key: string]: never }>;
 
 export type UserQuery = {
   __typename?: "QueryRoot";
-  me: { __typename?: "Member"; id: any; name: string; email: string; photoUrl?: string | null };
+  me: {
+    __typename?: "Member";
+    id: any;
+    name: string;
+    email: string;
+    photoUrl?: string | null;
+    role: MemberRole;
+  };
 };
 
 export type UpdateProfileMutationVariables = Exact<{
@@ -2735,6 +2742,7 @@ export const UserDocument = {
                 { kind: "Field", name: { kind: "Name", value: "name" } },
                 { kind: "Field", name: { kind: "Name", value: "email" } },
                 { kind: "Field", name: { kind: "Name", value: "photoUrl" } },
+                { kind: "Field", name: { kind: "Name", value: "role" } },
               ],
             },
           },

@@ -18,6 +18,8 @@ import { Edit } from "tabler-icons-react";
 
 import { UpdateMemberModal } from "./UpdateMemberForm";
 import { NewMemberModal } from "./NewMemberForm";
+import { usePlexoContext } from "context/PlexoContext";
+import { MemberRole } from "integration/graphql";
 
 const useStyles = createStyles(theme => ({
   rowSelected: {
@@ -59,6 +61,10 @@ export const MembersSection = ({ data }: MembersSectionProps) => {
   const [selection, setSelection] = useState(["1"]);
   const [opened, { open, close }] = useDisclosure(false);
 
+  const { userData } = usePlexoContext();
+  const isAdmin = userData?.role === MemberRole.Admin;
+
+
   const toggleRow = (id: string) =>
     setSelection(current =>
       current.includes(id) ? current.filter(item => item !== id) : [...current, id]
@@ -73,11 +79,13 @@ export const MembersSection = ({ data }: MembersSectionProps) => {
       return (
         <tr key={item.id} className={cx({ [classes.rowSelected]: selected })}>
           <td>
-            <Checkbox
+            {isAdmin && (
+              <Checkbox
               checked={selection.includes(item.id)}
               onChange={() => toggleRow(item.id)}
               transitionDuration={0}
-            />
+              />
+            )}
           </td>
           <td>
             <Group spacing="sm">
@@ -89,9 +97,11 @@ export const MembersSection = ({ data }: MembersSectionProps) => {
           </td>
           <td>{item.email}</td>
           <td>{item.job}</td>
-          <td>
-            <EditMemberAction member={item} />
-          </td>
+          {isAdmin && (
+            <td>
+              <EditMemberAction member={item} />
+            </td>
+          )}
         </tr>
       );
     });
@@ -100,27 +110,33 @@ export const MembersSection = ({ data }: MembersSectionProps) => {
     <Container size={"lg"}>
       <NewMemberModal opened={opened} close={close} />
       <Stack>
-        <Group position="right">
-          <Button compact onClick={open}>
-            Create Member
-          </Button>
-        </Group>
+        {isAdmin && (
+          <Group position="right">
+            <Button compact onClick={open}>
+              Create Member
+            </Button>
+          </Group>
+        )}
         <ScrollArea>
           <Table miw={800} verticalSpacing="sm">
             <thead>
               <tr>
                 <th style={{ width: rem(40) }}>
-                  <Checkbox
-                    onChange={toggleAll}
-                    checked={selection.length === data.length}
-                    indeterminate={selection.length > 0 && selection.length !== data.length}
-                    transitionDuration={0}
-                  />
+                  {isAdmin && (
+                    <Checkbox
+                      onChange={toggleAll}
+                      checked={selection.length === data.length}
+                      indeterminate={selection.length > 0 && selection.length !== data.length}
+                      transitionDuration={0}
+                    />
+                  )}
                 </th>
                 <th>User</th>
                 <th>Email</th>
                 <th>Job</th>
-                <th>Edit</th>
+                  {isAdmin && (
+                    <th>Edit</th>
+                  )}
               </tr>
             </thead>
             <tbody>{rows}</tbody>
