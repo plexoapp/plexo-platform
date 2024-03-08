@@ -91,6 +91,7 @@ const TeamDetailPageContent = ({ team, isLoading }: TeamDetailProps) => {
               <Group spacing={5} className={classes.propsBar}>
                 <MemberSelectorByTeam team={team} />
                 <ProjectsSelectorByTeam team={team} />
+                <VisibilitySelectorByTeam team={team} type="button" />
               </Group>
             )}
           </Stack>
