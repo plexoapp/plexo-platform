@@ -1,16 +1,16 @@
 import { Tuple } from "@mantine/core";
 
 export const colorBrandPrimary: Tuple<string, 10> = [
-  "#E8E6EE",
-  "#C2BCDB",
-  "#AFA3DC",
-  "#A08EE1",
-  "#8A72DF",
-  "#785DDC",
-  "#6241DC",
-  "#5636CC",
-  "#4B2EB7",
-  "#3919AE",
+  "#D3EBE4",
+  "#B6D4CB",
+  "#9CC9BB",
+  "#83C1AE",
+  "#60BB9F",
+  "#3EC39B",
+  "#19B888",
+  "#09BA85",
+  "#09AB7A",
+  "#079C6F",
 ];
 
 export const colorBrandDark: Tuple<string, 10> = [
