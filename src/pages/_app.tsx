@@ -65,7 +65,7 @@ const PlexoApp = ({
 
 PlexoApp.getInitialProps = ({ ctx }: { ctx: GetServerSidePropsContext }) => {
   return {
-    colorScheme: getCookie("mantine-color-scheme", ctx) || "light",
+    colorScheme: getCookie("mantine-color-scheme", ctx) || "dark",
     viewMode: getCookie("viewMode", ctx) || "list",
     authCookie: getCookie("plexo-session-token", ctx) || "",
     plexoAPIEndpoint: process.env.PLEXO_API_ENDPOINT || "",

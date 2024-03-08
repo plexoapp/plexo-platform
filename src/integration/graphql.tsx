@@ -470,6 +470,31 @@ export enum ProjectStatus {
   ToDo = "TO_DO",
 }
 
+export type ProjectSuggestion = {
+  __typename?: "ProjectSuggestion";
+  description: Scalars["String"]["output"];
+  name: Scalars["String"]["output"];
+  prefix: Scalars["String"]["output"];
+  status: ProjectStatus;
+  tasks?: Maybe<Array<TaskSuggestion>>;
+  visibility: ProjectVisibility;
+};
+
+export type ProjectSuggestionInput = {
+  description: Scalars["String"]["input"];
+  generateTasksNumber?: InputMaybe<Scalars["Int"]["input"]>;
+  initialTasks?: InputMaybe<Array<ProjectTaskSuggestionInput>>;
+  title?: InputMaybe<Scalars["String"]["input"]>;
+};
+
+export type ProjectTaskSuggestionInput = {
+  description: Scalars["String"]["input"];
+  dueDate: Scalars["DateTime"]["input"];
+  priority: TaskPriority;
+  status: TaskStatus;
+  title: Scalars["String"]["input"];
+};
+
 export enum ProjectVisibility {
   Internal = "INTERNAL",
   None = "NONE",
@@ -491,6 +516,7 @@ export type QueryRoot = {
   project: Project;
   projects: Array<Project>;
   subdivideTask: Array<TaskSuggestion>;
+  suggestNextProject: ProjectSuggestion;
   suggestNextTask: TaskSuggestion;
   task: Task;
   tasks: Array<Task>;
@@ -542,6 +568,10 @@ export type QueryRootSubdivideTaskArgs = {
   input: SubdivideTaskInput;
 };
 
+export type QueryRootSuggestNextProjectArgs = {
+  input: ProjectSuggestionInput;
+};
+
 export type QueryRootSuggestNextTaskArgs = {
   input: TaskSuggestionInput;
 };
@@ -570,6 +600,7 @@ export enum SortOrder {
 export type SubdivideTaskInput = {
   subtasks: Scalars["Int"]["input"];
   taskId: Scalars["UUID"]["input"];
+  withTasksContext?: InputMaybe<Scalars["Boolean"]["input"]>;
 };
 
 export type SubscriptionRoot = {

@@ -120,6 +120,7 @@ const LoginPage = () => {
             <Divider label="Or, continue with" labelPosition="center" />
 
             <Button
+              disabled
               component="a"
               href={loginGithubEndpoint}
               leftIcon={<BrandGithub />}
