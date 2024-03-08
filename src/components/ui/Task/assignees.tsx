@@ -138,7 +138,7 @@ const GenericAssigneesMenu = ({
   return (
     <Menu shadow="md" closeOnItemClick={false} position="bottom-start" withinPortal>
       <Menu.Target>
-        <Tooltip label="Assignees" position="bottom">
+        <Tooltip label="Change assigness" position="bottom">
           {children}
         </Tooltip>
       </Menu.Target>

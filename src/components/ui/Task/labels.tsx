@@ -189,7 +189,7 @@ const GenericLabelsMenu = ({
   return (
     <Menu shadow="md" closeOnItemClick={false} position="bottom-start" withinPortal>
       <Menu.Target>
-        <Tooltip label="Add labels" position="bottom">
+        <Tooltip label="Change labels" position="bottom">
           {children}
         </Tooltip>
       </Menu.Target>

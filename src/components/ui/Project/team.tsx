@@ -143,7 +143,7 @@ const GenericTeamMenu = ({ children, selectedTeams, setSelectedTeams }: GenericT
   return (
     <Menu shadow="md" closeOnItemClick={false} position="bottom-start" withinPortal>
       <Menu.Target>
-        <Tooltip label="Teams" position="bottom">
+        <Tooltip label="Change teams" position="bottom">
           {children}
         </Tooltip>
       </Menu.Target>
