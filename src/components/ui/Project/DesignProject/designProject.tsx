@@ -59,7 +59,7 @@ const parseTasks = (tasks: ProjectTask[], projectId: string) => {
       title: task.title,
       description: task.description,
       status: statusName(task.status),
-      lead: task.lead?.id,
+      leadId: task.lead?.id,
       projectId: projectId,
     };
   });
