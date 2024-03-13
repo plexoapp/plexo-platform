@@ -84,3 +84,18 @@ mutation UpdateProject($id: UUID!, $input: UpdateProjectInput!) {
     name
   }
 }
+
+query SuggestProject($input: ProjectSuggestionInput!) {
+  suggestNextProject(input: $input) {
+    name
+    status
+    visibility
+    description
+    tasks {
+      title
+      description
+      status
+      priority
+    }
+  }
+}

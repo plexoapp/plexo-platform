@@ -10,17 +10,20 @@ import {
   Box,
   Grid,
   Tooltip,
-  ActionIcon,
   Collapse,
 } from "@mantine/core";
-import { Barbell, BuildingStore, Music, Plus, Robot } from "tabler-icons-react";
-import { useState } from "react";
+import { Barbell, BuildingStore, Music, Robot } from "tabler-icons-react";
+import { useEffect, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 
 import { IconSparkles } from "@tabler/icons-react";
 import { useToggle } from "@mantine/hooks";
 import ProjectTasks, { ProjectTask } from "./projectTasks";
-import { TaskStatus } from "integration/graphql";
+import { SuggestProjectDocument } from "integration/graphql";
+import { useQuery } from "urql";
+import { useActions } from "lib/hooks/useActions";
+import { ErrorNotification, SuccessNotification } from "lib/notifications";
+import { statusName } from "components/ui/Task/status";
 
 type DesignProjectProps = {
   designProjectOpened: boolean;
@@ -50,18 +53,17 @@ const projectsList = [
   },
 ];
 
-const suggestedTasks = [
-  {
-    title: "Suggested task 1",
-    status: TaskStatus.InProgress,
-    lead: null,
-  },
-  {
-    title: "Suggested task 2",
-    status: TaskStatus.Done,
-    lead: null,
-  },
-];
+const parseTasks = (tasks: ProjectTask[], projectId: string) => {
+  return tasks.map(task => {
+    return {
+      title: task.title,
+      description: task.description,
+      status: statusName(task.status),
+      lead: task.lead?.id,
+      projectId: projectId,
+    };
+  });
+};
 
 const DesignProject = ({ designProjectOpened, setDesignProjectOpened }: DesignProjectProps) => {
   const theme = useMantineTheme();
@@ -70,6 +72,51 @@ const DesignProject = ({ designProjectOpened, setDesignProjectOpened }: DesignPr
   const [description, setDescription] = useState("");
   const [tasks, setTasks] = useState<ProjectTask[]>([]);
   const [showTasks, toggleTasks] = useToggle([false, true]);
+  const [showExamples, toggleExamples] = useToggle([false, true]);
+  const { createProject, fetchCreateProject, createTasks, fetchCreateTasks } = useActions();
+
+  const [
+    { data: projectSuggestionData, fetching: isLoadingProjectSuggestion },
+    fetchProjectSuggestion,
+  ] = useQuery({
+    pause: true,
+    query: SuggestProjectDocument,
+    variables: {
+      input: {
+        title: name,
+        description: description,
+        generateTasksNumber: 3,
+      },
+    },
+  });
+
+  const projectSuggestion = async () => {
+    fetchProjectSuggestion();
+  };
+
+  useEffect(() => {
+    if (projectSuggestionData) {
+      const res = projectSuggestionData;
+
+      setName(res?.suggestNextProject.name || name);
+      setDescription(res?.suggestNextProject.description || description);
+
+      if (res?.suggestNextProject?.tasks?.length) {
+        setTasks([
+          ...res?.suggestNextProject?.tasks?.map(task => ({
+            id: uuidv4(),
+            title: task.title,
+            description: task.description,
+            status: task.status,
+            lead: null,
+            origin: "suggested",
+          })),
+          ...tasks,
+        ]);
+        toggleTasks(true);
+      }
+    }
+  }, [projectSuggestionData]);
 
   const projects = projectsList.map(project => (
     <Grid.Col key={project.title} xs={12} sm={6}>
@@ -101,25 +148,52 @@ const DesignProject = ({ designProjectOpened, setDesignProjectOpened }: DesignPr
     </Grid.Col>
   ));
 
-  const addSuggestedTasks = () => {
-    !showTasks && toggleTasks();
-    setTasks([
-      ...suggestedTasks.map(task => ({
-        id: uuidv4(),
-        title: task.title,
-        status: task.status,
-        lead: task.lead,
-        origin: "suggested",
-      })),
-      ...tasks,
-    ]);
-  };
-
   const resetInitialValues = () => {
     setName("");
     setDescription("");
     setTasks([]);
     showTasks && toggleTasks();
+  };
+
+  useEffect(() => {
+    description.length ? toggleExamples(false) : toggleExamples(true);
+  }, [description]);
+
+  const onCreateProject = async () => {
+    const res = await fetchCreateProject({
+      input: {
+        name: name,
+        description: description,
+      },
+    });
+
+    if (res.data) {
+      SuccessNotification("Project created!", `${res.data.createProject.name} created`);
+
+      if (res.data.createProject.id) {
+        await onCreateTasks(res.data.createProject.id);
+      }
+    }
+    if (res.error) {
+      ErrorNotification(res.error.message);
+    }
+  };
+
+  const onCreateTasks = async (id: string) => {
+    const res = await fetchCreateTasks({
+      input: {
+        tasks: parseTasks(tasks, id),
+      },
+    });
+
+    if (res.data) {
+      SuccessNotification("Tasks created!", `${res.data.createTasks.length} tasks created`);
+      resetInitialValues();
+      setDesignProjectOpened(false);
+    }
+    if (res.error) {
+      ErrorNotification(res.error.message);
+    }
   };
 
   return (
@@ -144,7 +218,7 @@ const DesignProject = ({ designProjectOpened, setDesignProjectOpened }: DesignPr
         </Group>
       }
     >
-      <Stack spacing={theme.spacing.xs} pb={"md"}>
+      <Stack spacing={theme.spacing.xs}>
         <Textarea
           autosize
           minRows={1}
@@ -177,44 +251,36 @@ const DesignProject = ({ designProjectOpened, setDesignProjectOpened }: DesignPr
             },
           })}
         />
-        <Text size="xs" /* color="dimmed" */>Or choose one of the following:</Text>
-        <Grid>{projects}</Grid>
 
-        <Group position="apart">
-          <Text lineClamp={1} size={"sm"} /* color={"dimmed"} */>
-            Add or generate tasks
-          </Text>
-          <Group spacing={5}>
-            <Tooltip label="Add task" position="bottom">
-              <ActionIcon
-                disabled={name.length ? false : true}
-                onClick={() => toggleTasks()}
-                /* onClick={() => {
-                    setTaskId(task?.id);
-                setNewTaskOpened(true);
-                  }} */
-              >
-                <Plus size={16} />
-              </ActionIcon>
-            </Tooltip>
+        <Collapse in={showExamples} transitionDuration={500}>
+          <Stack spacing={theme.spacing.xs}>
+            <Text size="xs">Or choose one of the following:</Text>
+            <Grid>{projects}</Grid>
+          </Stack>
+        </Collapse>
 
-            <Tooltip withinPortal label="Generate tasks with AI" position="bottom">
-              <ActionIcon
-                variant="light"
-                color={"brand"}
-                disabled={name.length ? false : true}
-                onClick={() => addSuggestedTasks()}
-              >
-                <IconSparkles size={16} />
-              </ActionIcon>
-            </Tooltip>
-          </Group>
+        <Collapse in={showTasks} transitionDuration={500}>
+          <ProjectTasks tasks={tasks} setTasks={setTasks} name={name} description={description} />
+        </Collapse>
+        <Group position="right">
+          <Tooltip withinPortal label="Design project with AI" position="bottom">
+            <Button
+              compact
+              variant="light"
+              color={"brand"}
+              leftIcon={<IconSparkles size={16} />}
+              disabled={description.length ? false : true}
+              onClick={projectSuggestion}
+              loading={isLoadingProjectSuggestion}
+            >
+              Design project
+            </Button>
+          </Tooltip>
         </Group>
       </Stack>
-      <Collapse in={showTasks} transitionDuration={500}>
-        <ProjectTasks tasks={tasks} setTasks={setTasks} />
-      </Collapse>
+
       <Group
+        mt={"md"}
         pt={"md"}
         position="right"
         sx={{
@@ -234,18 +300,17 @@ const DesignProject = ({ designProjectOpened, setDesignProjectOpened }: DesignPr
         >
           Cancel
         </Button>
-        <Button
-          compact
-          variant="filled"
-          disabled={name.length ? false : true}
-          /* loading={createProject.fetching} */
-          onClick={() => {
-            console.log({ name, description });
-            /* onCreateProject(); */
-          }}
-        >
-          Create project
-        </Button>
+        <Tooltip withinPortal label="Create project and tasks" position="bottom">
+          <Button
+            compact
+            variant="filled"
+            disabled={name.length && description.length && tasks.length ? false : true}
+            loading={createProject.fetching || createTasks.fetching ? true : false}
+            onClick={() => onCreateProject()}
+          >
+            Create project
+          </Button>
+        </Tooltip>
       </Group>
     </Modal>
   );

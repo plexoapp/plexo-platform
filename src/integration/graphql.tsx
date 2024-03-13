@@ -470,6 +470,31 @@ export enum ProjectStatus {
   ToDo = "TO_DO",
 }
 
+export type ProjectSuggestion = {
+  __typename?: "ProjectSuggestion";
+  description: Scalars["String"]["output"];
+  name: Scalars["String"]["output"];
+  prefix: Scalars["String"]["output"];
+  status: ProjectStatus;
+  tasks?: Maybe<Array<TaskSuggestion>>;
+  visibility: ProjectVisibility;
+};
+
+export type ProjectSuggestionInput = {
+  description: Scalars["String"]["input"];
+  generateTasksNumber?: InputMaybe<Scalars["Int"]["input"]>;
+  initialTasks?: InputMaybe<Array<ProjectTaskSuggestionInput>>;
+  title?: InputMaybe<Scalars["String"]["input"]>;
+};
+
+export type ProjectTaskSuggestionInput = {
+  description: Scalars["String"]["input"];
+  dueDate: Scalars["DateTime"]["input"];
+  priority: TaskPriority;
+  status: TaskStatus;
+  title: Scalars["String"]["input"];
+};
+
 export enum ProjectVisibility {
   Internal = "INTERNAL",
   None = "NONE",
@@ -491,6 +516,7 @@ export type QueryRoot = {
   project: Project;
   projects: Array<Project>;
   subdivideTask: Array<TaskSuggestion>;
+  suggestNextProject: ProjectSuggestion;
   suggestNextTask: TaskSuggestion;
   task: Task;
   tasks: Array<Task>;
@@ -542,6 +568,10 @@ export type QueryRootSubdivideTaskArgs = {
   input: SubdivideTaskInput;
 };
 
+export type QueryRootSuggestNextProjectArgs = {
+  input: ProjectSuggestionInput;
+};
+
 export type QueryRootSuggestNextTaskArgs = {
   input: TaskSuggestionInput;
 };
@@ -570,6 +600,7 @@ export enum SortOrder {
 export type SubdivideTaskInput = {
   subtasks: Scalars["Int"]["input"];
   taskId: Scalars["UUID"]["input"];
+  withTasksContext?: InputMaybe<Scalars["Boolean"]["input"]>;
 };
 
 export type SubscriptionRoot = {
@@ -916,6 +947,28 @@ export type UpdateProjectMutationVariables = Exact<{
 export type UpdateProjectMutation = {
   __typename?: "MutationRoot";
   updateProject: { __typename?: "Project"; id: any; name: string };
+};
+
+export type SuggestProjectQueryVariables = Exact<{
+  input: ProjectSuggestionInput;
+}>;
+
+export type SuggestProjectQuery = {
+  __typename?: "QueryRoot";
+  suggestNextProject: {
+    __typename?: "ProjectSuggestion";
+    name: string;
+    status: ProjectStatus;
+    visibility: ProjectVisibility;
+    description: string;
+    tasks?: Array<{
+      __typename?: "TaskSuggestion";
+      title: string;
+      description: string;
+      status: TaskStatus;
+      priority: TaskPriority;
+    }> | null;
+  };
 };
 
 export type TasksQueryVariables = Exact<{ [key: string]: never }>;
@@ -1868,6 +1921,64 @@ export const UpdateProjectDocument = {
     },
   ],
 } as unknown as DocumentNode<UpdateProjectMutation, UpdateProjectMutationVariables>;
+export const SuggestProjectDocument = {
+  kind: "Document",
+  definitions: [
+    {
+      kind: "OperationDefinition",
+      operation: "query",
+      name: { kind: "Name", value: "SuggestProject" },
+      variableDefinitions: [
+        {
+          kind: "VariableDefinition",
+          variable: { kind: "Variable", name: { kind: "Name", value: "input" } },
+          type: {
+            kind: "NonNullType",
+            type: { kind: "NamedType", name: { kind: "Name", value: "ProjectSuggestionInput" } },
+          },
+        },
+      ],
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "suggestNextProject" },
+            arguments: [
+              {
+                kind: "Argument",
+                name: { kind: "Name", value: "input" },
+                value: { kind: "Variable", name: { kind: "Name", value: "input" } },
+              },
+            ],
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                { kind: "Field", name: { kind: "Name", value: "name" } },
+                { kind: "Field", name: { kind: "Name", value: "status" } },
+                { kind: "Field", name: { kind: "Name", value: "visibility" } },
+                { kind: "Field", name: { kind: "Name", value: "description" } },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "tasks" },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      { kind: "Field", name: { kind: "Name", value: "title" } },
+                      { kind: "Field", name: { kind: "Name", value: "description" } },
+                      { kind: "Field", name: { kind: "Name", value: "status" } },
+                      { kind: "Field", name: { kind: "Name", value: "priority" } },
+                    ],
+                  },
+                },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<SuggestProjectQuery, SuggestProjectQueryVariables>;
 export const TasksDocument = {
   kind: "Document",
   definitions: [

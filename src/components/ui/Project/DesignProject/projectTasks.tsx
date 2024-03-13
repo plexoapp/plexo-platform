@@ -3,11 +3,9 @@ import {
   Stack,
   TextInput,
   Text,
-  Button,
   useMantineTheme,
   Paper,
   Tooltip,
-  Center,
   ActionIcon,
 } from "@mantine/core";
 import { Plus, X } from "tabler-icons-react";
@@ -15,15 +13,15 @@ import { useState } from "react";
 
 import { TaskStatus } from "integration/graphql";
 import { Member } from "lib/types";
-import { StatusIcon, StatusSelector, statusLabel } from "components/ui/Task/status";
-import { LeadTaskSelector } from "components/ui/Task/lead";
-import { MemberPhoto } from "components/ui/MemberPhoto";
+import { ManualStatusSelector, StatusSelector, statusLabel } from "components/ui/Task/status";
+import { LeadTaskSelector, ManualLeadTaskSelector } from "components/ui/Task/lead";
 import { v4 as uuidv4 } from "uuid";
 import { IconSparkles } from "@tabler/icons-react";
 
 export type ProjectTask = {
   id: string;
   title: string;
+  description: string;
   status: TaskStatus;
   lead: Member | null;
   origin: string;
@@ -32,13 +30,38 @@ export type ProjectTask = {
 type ProjectTasksProps = {
   tasks: ProjectTask[];
   setTasks: (subtasks: ProjectTask[]) => void;
+  name: string;
+  description: string;
 };
 
-const ProjectTasks = ({ tasks, setTasks }: ProjectTasksProps) => {
+const ProjectTasks = ({ tasks, setTasks, name, description }: ProjectTasksProps) => {
   const theme = useMantineTheme();
   const [title, setTitle] = useState("");
   const [status, setStatus] = useState<TaskStatus>(TaskStatus.Backlog);
   const [lead, setLead] = useState<Member | null>(null);
+
+  /*   const [
+    { data: projectTasksSuggestionData, fetching: isLoadingProjectTasksSuggestion },
+    fetchProjectTasksSuggestion,
+  ] = useQuery({
+    pause: true,
+    query: SuggestProjectDocument,
+    variables: {
+      input: {
+        title: name,
+        description: description,
+        generateTasksNumber: 3,
+        initialTasks: tasks.map(task => {
+          return {
+            title: task.title,
+            description: task.description,
+            status: task.status,
+           
+          };
+        }),
+      },
+    },
+  }); */
 
   const handleAddSubtask = (event: { preventDefault: () => void }) => {
     event.preventDefault();
@@ -47,6 +70,7 @@ const ProjectTasks = ({ tasks, setTasks }: ProjectTasksProps) => {
       {
         id: uuidv4(),
         title: title,
+        description: "",
         status: status,
         lead: lead,
         origin: "created",
@@ -65,14 +89,10 @@ const ProjectTasks = ({ tasks, setTasks }: ProjectTasksProps) => {
       <Paper key={task.id} px={6} py={4} mt={1}>
         <Group spacing={0}>
           <Tooltip label={statusLabel(task.status)} position="bottom">
-            <Center w={28} h={28}>
-              {StatusIcon(theme, task.status)}
-            </Center>
+            <ManualStatusSelector task={task} tasks={tasks} setTasks={setTasks} />
           </Tooltip>
           <Tooltip label={task.lead?.name ? task.lead?.name : "No assignee"} position="bottom">
-            <Center w={28} h={28}>
-              {MemberPhoto(task.lead?.photoUrl)}
-            </Center>
+            <ManualLeadTaskSelector task={task} tasks={tasks} setTasks={setTasks} />
           </Tooltip>
 
           <Text size={"sm"} sx={{ flex: 1 }}>
@@ -101,13 +121,14 @@ const ProjectTasks = ({ tasks, setTasks }: ProjectTasksProps) => {
       spacing={0}
       p={10}
       sx={{
-        borderTopWidth: 1,
-        borderTopStyle: "solid",
-        borderTopColor: theme.colorScheme === "dark" ? theme.colors.dark[6] : theme.colors.gray[2],
         backgroundColor: theme.colorScheme === "dark" ? theme.colors.dark[8] : theme.colors.gray[0],
       }}
     >
       <form onSubmit={handleAddSubtask}>
+        <Text lineClamp={1} size={"sm"}>
+          Add or generate tasks
+        </Text>
+
         <Group spacing={0} px={6} py={4}>
           <StatusSelector status={status} setStatus={setStatus} type="icon" />
           <LeadTaskSelector lead={lead} setLead={setLead} type="icon" />
@@ -125,16 +146,24 @@ const ProjectTasks = ({ tasks, setTasks }: ProjectTasksProps) => {
             }}
           />
 
-          <Button
-            compact
-            disabled={title.length ? false : true}
-            variant="light"
-            color={"brand"}
-            leftIcon={<Plus size={16} />}
-            type="submit"
-          >
-            <Text size={"xs"}>Add task</Text>
-          </Button>
+          <Group spacing={4}>
+            <Tooltip withinPortal label="Add task" position="bottom">
+              <ActionIcon disabled={title.length ? false : true} color={"brand"} type="submit">
+                <Plus size={16} />
+              </ActionIcon>
+            </Tooltip>
+
+            <Tooltip withinPortal label="Generate tasks with AI" position="bottom">
+              <ActionIcon
+                variant="light"
+                color={"brand"}
+                /* disabled={name.length ? false : true}
+              onClick={() => addSuggestedTasks()} */
+              >
+                <IconSparkles size={16} />
+              </ActionIcon>
+            </Tooltip>
+          </Group>
         </Group>
       </form>
       <Stack spacing={1}>{tasksList.length ? tasksList : null}</Stack>
