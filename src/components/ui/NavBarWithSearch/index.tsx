@@ -11,6 +11,7 @@ import {
   Center,
   Tooltip,
   rem,
+  ScrollArea,
 } from "@mantine/core";
 
 import router from "next/router";
@@ -118,7 +119,7 @@ type NavBarWithSearchProps = {
 };
 
 export function NavbarSearch({ onNewTask, openedNav, setOpenedNav }: NavBarWithSearchProps) {
-  const { classes } = useStyles();
+  const { classes, theme } = useStyles();
   const [section, setSection] = useState<"projects" | "teams">("projects");
   const [newProjectOpened, setNewProjectOpened] = useState(false);
   const [designProjectOpened, setDesignProjectOpened] = useState(false);
@@ -189,18 +190,9 @@ export function NavbarSearch({ onNewTask, openedNav, setOpenedNav }: NavBarWithS
             </ActionIcon>
           </Group>
           <div>{mainLinks}</div>
-          <Button
-            /* compact */
-            w={"100%"}
-            variant="light"
-            leftIcon={<IconSparkles size={16} />}
-            onClick={() => setDesignProjectOpened(true)}
-          >
-            Design your project
-          </Button>
         </Navbar.Section>
-        <Navbar.Section className={classes.section} p="sm">
-          <Group position="apart" mb={"xs"}>
+        <Navbar.Section p="sm">
+          <Group position="apart">
             <SegmentedControl
               size={"xs"}
               value={section}
@@ -241,7 +233,29 @@ export function NavbarSearch({ onNewTask, openedNav, setOpenedNav }: NavBarWithS
               </ActionIcon>
             </Tooltip>
           </Group>
+        </Navbar.Section>
+        <Navbar.Section className={classes.section} grow component={ScrollArea} p="xs" pt={0}>
           {section === "teams" ? <TeamsList /> : <ProjectsList />}
+        </Navbar.Section>
+        <Navbar.Section p="sm">
+          <Button
+            w={"100%"}
+            variant="default"
+            leftIcon={
+              <IconSparkles
+                size={16}
+                color={theme.colorScheme === "dark" ? theme.colors.brand[4] : theme.colors.brand[6]}
+              />
+            }
+            onClick={() => setDesignProjectOpened(true)}
+            styles={{
+              label: {
+                color: theme.colorScheme === "dark" ? theme.colors.brand[4] : theme.colors.brand[6],
+              },
+            }}
+          >
+            Design your project
+          </Button>
         </Navbar.Section>
       </Navbar>
     </>

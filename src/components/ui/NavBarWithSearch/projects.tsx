@@ -1,10 +1,9 @@
-import { Button, Navbar, NavLink, Skeleton, Stack, useMantineTheme } from "@mantine/core";
+import { Navbar, NavLink, Skeleton, Stack, useMantineTheme } from "@mantine/core";
 import { Rocket } from "tabler-icons-react";
 import router from "next/router";
 
 import { Project } from "lib/types";
 import { usePlexoContext } from "context/PlexoContext";
-import { IconSparkles } from "@tabler/icons-react";
 
 const ProjectsList = () => {
   const theme = useMantineTheme();
@@ -17,7 +16,7 @@ const ProjectsList = () => {
         <NavLink
           key={index}
           label={p.name}
-          icon={<Rocket size={16} color={theme.colors.brand[4]} />}
+          icon={<Rocket size={16} color={theme.colors.brand[6]} />}
           onClick={() => router.push(`/projects/${p.id}`)}
           styles={theme => ({
             root: {
