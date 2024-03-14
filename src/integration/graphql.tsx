@@ -58,19 +58,19 @@ export type Change = {
 };
 
 export enum ChangeOperation {
-  Create = "CREATE",
   Delete = "DELETE",
+  Insert = "INSERT",
   Update = "UPDATE",
 }
 
 export enum ChangeResourceType {
-  Asset = "ASSET",
-  Change = "CHANGE",
-  Label = "LABEL",
-  Member = "MEMBER",
-  Project = "PROJECT",
-  Task = "TASK",
-  Team = "TEAM",
+  Assets = "ASSETS",
+  Changes = "CHANGES",
+  Labels = "LABELS",
+  Members = "MEMBERS",
+  Projects = "PROJECTS",
+  Tasks = "TASKS",
+  Teams = "TEAMS",
 }
 
 export type CreateAssetInput = {
@@ -282,6 +282,13 @@ export type Label = {
   updatedAt: Scalars["DateTime"]["output"];
 };
 
+export type ListenEvent = {
+  __typename?: "ListenEvent";
+  operation: ChangeOperation;
+  resource: ChangeResourceType;
+  rowId: Scalars["UUID"]["output"];
+};
+
 export type LoginResponse = {
   __typename?: "LoginResponse";
   memberId: Scalars["String"]["output"];
@@ -481,17 +488,17 @@ export type ProjectSuggestion = {
 };
 
 export type ProjectSuggestionInput = {
-  description: Scalars["String"]["input"];
+  description?: InputMaybe<Scalars["String"]["input"]>;
   generateTasksNumber?: InputMaybe<Scalars["Int"]["input"]>;
   initialTasks?: InputMaybe<Array<ProjectTaskSuggestionInput>>;
-  title?: InputMaybe<Scalars["String"]["input"]>;
+  title: Scalars["String"]["input"];
 };
 
 export type ProjectTaskSuggestionInput = {
-  description: Scalars["String"]["input"];
-  dueDate: Scalars["DateTime"]["input"];
-  priority: TaskPriority;
-  status: TaskStatus;
+  description?: InputMaybe<Scalars["String"]["input"]>;
+  dueDate?: InputMaybe<Scalars["DateTime"]["input"]>;
+  priority?: InputMaybe<TaskPriority>;
+  status?: InputMaybe<TaskStatus>;
   title: Scalars["String"]["input"];
 };
 
@@ -605,7 +612,12 @@ export type SubdivideTaskInput = {
 
 export type SubscriptionRoot = {
   __typename?: "SubscriptionRoot";
-  events1: Scalars["Int"]["output"];
+  assets: ListenEvent;
+  labels: ListenEvent;
+  members: ListenEvent;
+  projects: ListenEvent;
+  tasks: ListenEvent;
+  teams: ListenEvent;
 };
 
 export type Task = {

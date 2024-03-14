@@ -9,14 +9,15 @@ import {
   ActionIcon,
 } from "@mantine/core";
 import { Plus, X } from "tabler-icons-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
-import { TaskStatus } from "integration/graphql";
+import { SuggestProjectDocument, TaskStatus } from "integration/graphql";
 import { Member } from "lib/types";
 import { ManualStatusSelector, StatusSelector, statusLabel } from "components/ui/Task/status";
 import { LeadTaskSelector, ManualLeadTaskSelector } from "components/ui/Task/lead";
 import { v4 as uuidv4 } from "uuid";
 import { IconSparkles } from "@tabler/icons-react";
+import { useQuery } from "urql";
 
 export type ProjectTask = {
   id: string;
@@ -40,7 +41,7 @@ const ProjectTasks = ({ tasks, setTasks, name, description }: ProjectTasksProps)
   const [status, setStatus] = useState<TaskStatus>(TaskStatus.Backlog);
   const [lead, setLead] = useState<Member | null>(null);
 
-  /*   const [
+  const [
     { data: projectTasksSuggestionData, fetching: isLoadingProjectTasksSuggestion },
     fetchProjectTasksSuggestion,
   ] = useQuery({
@@ -55,13 +56,36 @@ const ProjectTasks = ({ tasks, setTasks, name, description }: ProjectTasksProps)
           return {
             title: task.title,
             description: task.description,
-            status: task.status,
-           
+            /* status: task.status, */
           };
         }),
       },
     },
-  }); */
+  });
+
+  const projectTasksSuggestion = async () => {
+    fetchProjectTasksSuggestion();
+  };
+
+  useEffect(() => {
+    if (projectTasksSuggestionData) {
+      const res = projectTasksSuggestionData;
+
+      if (res?.suggestNextProject?.tasks?.length) {
+        setTasks([
+          ...res?.suggestNextProject?.tasks?.map(task => ({
+            id: uuidv4(),
+            title: task.title,
+            description: task.description,
+            status: task.status,
+            lead: null,
+            origin: "suggested",
+          })),
+          ...tasks,
+        ]);
+      }
+    }
+  }, [projectTasksSuggestionData]);
 
   const handleAddSubtask = (event: { preventDefault: () => void }) => {
     event.preventDefault();
@@ -157,8 +181,10 @@ const ProjectTasks = ({ tasks, setTasks, name, description }: ProjectTasksProps)
               <ActionIcon
                 variant="light"
                 color={"brand"}
-                /* disabled={name.length ? false : true}
-              onClick={() => addSuggestedTasks()} */
+                /* disabled={name.length ? false : true} */
+                disabled
+                onClick={() => projectTasksSuggestion()}
+                loading={isLoadingProjectTasksSuggestion}
               >
                 <IconSparkles size={16} />
               </ActionIcon>
