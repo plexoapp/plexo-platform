@@ -31,7 +31,7 @@ const ActivityIcon = ({ activity }: { activity: TaskChanges }) => {
   const color = activity.operation == "DELETE" ? "red" : "gray";
   return (
     <ThemeIcon size={16} color={color} variant="light" radius="xl">
-      {activity.operation == "CREATE" ? (
+      {activity.operation == "INSERT" ? (
         <UserCircle />
       ) : activity.operation == "UPDATE" ? (
         <Pencil />
@@ -46,7 +46,7 @@ const ActivityIcon = ({ activity }: { activity: TaskChanges }) => {
 
 const ActivityDescription = ({ activity }: { activity: TaskChanges | undefined }) => {
   const description =
-    activity?.operation == "CREATE"
+    activity?.operation == "INSERT"
       ? ` created the task - ${formatDateDifference(activity.createdAt)}`
       : activity?.operation == "UPDATE"
       ? ` updated the task - ${formatDateDifference(activity.createdAt)}`
@@ -93,7 +93,7 @@ export const ActivitiesTask = ({
       input: {
         filter: {
           resourceId: task?.id,
-          resourceType: ChangeResourceType.Task,
+          resourceType: ChangeResourceType.Tasks,
         },
       },
     },
