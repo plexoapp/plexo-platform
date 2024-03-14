@@ -190,7 +190,7 @@ export const GenericPriorityMenu = ({ children, onSelect, task }: GenericPriorit
   return (
     <Menu shadow="md" width={180} position="bottom-start" withinPortal>
       <Menu.Target>
-        <Tooltip label="Set priority" position="bottom">
+        <Tooltip label="Change priority" position="bottom">
           {children}
         </Tooltip>
       </Menu.Target>

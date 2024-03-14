@@ -73,22 +73,27 @@ const PlexoProvider = ({
   const [labelsData, setLabelsData] = useState<Label[] | undefined>(undefined);
 
   const [{ data: user, fetching: isLoadingUser }] = useQuery({
+    pause: authCookie ? false : true,
     query: UserDocument,
   });
 
   const [{ data: projects, fetching: isLoadingProjects }] = useQuery({
+    pause: authCookie ? false : true,
     query: ProjectsDocument,
   });
 
   const [{ data: members, fetching: isLoadingMembers }] = useQuery({
+    pause: authCookie ? false : true,
     query: MembersDocument,
   });
 
   const [{ data: teams, fetching: isLoadingTeams }] = useQuery({
+    pause: authCookie ? false : true,
     query: TeamsDocument,
   });
 
   const [{ data: labels, fetching: isLoadingLabels }] = useQuery({
+    pause: authCookie ? false : true,
     query: LabelsDocument,
   });
 

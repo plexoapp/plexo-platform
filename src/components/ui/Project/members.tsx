@@ -97,7 +97,7 @@ const GenericMemberMenu = ({
   return (
     <Menu shadow="md" closeOnItemClick={false} position="bottom-start" withinPortal>
       <Menu.Target>
-        <Tooltip label="Project members" position="bottom">
+        <Tooltip label="Change members" position="bottom">
           {children}
         </Tooltip>
       </Menu.Target>

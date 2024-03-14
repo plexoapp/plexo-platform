@@ -26,6 +26,7 @@ import { validateDate } from "lib/utils";
 import { TitleForm } from "./Form";
 import { DateGenericSelector } from "components/ui/DateGenericSelector";
 import { StatusSelectorByProject } from "components/ui/Project/status";
+import { VisibilitySelectorByProject } from "components/ui/Project/visibility";
 
 type ProjectDetailProps = {
   project: ProjectById | undefined;
@@ -150,6 +151,7 @@ const ProjectDetailContent = ({ project, isLoading }: ProjectDetailProps) => {
                 <LeadSelectorByProject project={project} />
                 <MemberSelectorByProject project={project} />
                 <TeamSelectorByProject project={project} />
+                <VisibilitySelectorByProject project={project} type="button" />
                 <DateGenericSelector
                   placeholder={"Set start date"}
                   date={startDate}
@@ -228,6 +230,17 @@ const ProjectDetailContent = ({ project, isLoading }: ProjectDetailProps) => {
               <TeamSelectorByProject project={project} />
             )}
           </Group>
+          <Group>
+            <Text w={90} lineClamp={1} size={"sm"} color={"dimmed"}>
+              Visibility
+            </Text>
+            {isLoading ? (
+              <Skeleton height={26} width={100} />
+            ) : (
+              <VisibilitySelectorByProject project={project} type="button" />
+            )}
+          </Group>
+
           <Group>
             <Text w={90} lineClamp={1} size={"sm"} color={"dimmed"}>
               Start Date

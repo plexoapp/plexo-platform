@@ -241,7 +241,7 @@ const NewTask = ({ newTaskOpened, setNewTaskOpened, createMore, setCreateMore }:
           <ProjectSelector project={project} setProject={setProject} />
           <Popover position="bottom" shadow="md" withinPortal>
             <Popover.Target>
-              <Tooltip label="Set due date" position="bottom">
+              <Tooltip label="Change due date" position="bottom">
                 <Button
                   compact
                   variant="light"
@@ -256,15 +256,17 @@ const NewTask = ({ newTaskOpened, setNewTaskOpened, createMore, setCreateMore }:
               <DatePicker value={dueDate} onChange={setDueDate} />
             </Popover.Dropdown>
           </Popover>
-          <Button
-            compact
-            variant="light"
-            color={"gray"}
-            leftIcon={<Subtask size={16} />}
-            onClick={() => toggleSubtasks()}
-          >
-            <Text size={"xs"}>Subtasks</Text>
-          </Button>
+          <Tooltip label="Add subtasks" position="bottom">
+            <Button
+              compact
+              variant="light"
+              color={"gray"}
+              leftIcon={<Subtask size={16} />}
+              onClick={() => toggleSubtasks()}
+            >
+              <Text size={"xs"}>Subtasks</Text>
+            </Button>
+          </Tooltip>
         </Group>
       </Stack>
       <Collapse in={showSubtasks} transitionDuration={500}>

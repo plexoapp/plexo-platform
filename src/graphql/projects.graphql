@@ -40,6 +40,7 @@ query ProjectById($projectId: UUID!) {
     startDate
     dueDate
     status
+    visibility
     owner {
       id
       name

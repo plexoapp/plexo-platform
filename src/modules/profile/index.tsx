@@ -26,6 +26,10 @@ const useStyles = createStyles(theme => ({
       minWidth: 200,
     },
   },
+  avatar: {
+    backgroundColor: theme.colors.brand[6],
+    color: theme.colors.brand[0],
+  },
 }));
 
 type UserPhoto = {
@@ -41,7 +45,7 @@ export const UserPhoto = ({ user, size }: UserPhoto) => {
       {user?.name[0]}
     </Avatar>
   ) : (
-    <Avatar size={size} radius="xl" />
+    <Avatar color="brand" size={size} radius="xl" />
   );
 };
 
