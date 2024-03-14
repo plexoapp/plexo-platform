@@ -2,18 +2,18 @@ import { Button, Group, Modal, Select, Stack, TextInput } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { useMutation } from "urql";
 
-import { UpdateMemberDocument } from "integration/graphql";
+import { UpdateMemberDocument, MemberRole } from "integration/graphql";
 import { ErrorNotification, SuccessNotification } from "lib/notifications";
 import { MemberProps } from ".";
 
 const getRole = (role: string) => {
   switch (role) {
     case "MEMBER":
-      return "Member";
+      return MemberRole.Member;
     case "ADMIN":
-      return "Admin";
+      return MemberRole.Admin;
     default:
-      return "Read_only";
+      return MemberRole.ReadOnly;
   }
 };
 
@@ -41,10 +41,12 @@ export const UpdateMemberModal = ({
 
   const onUpdateMember = async (values: typeof form.values) => {
     const res = await updateMember({
-      memberId: member?.id,
-      name: values.name,
-      email: values.email,
-      role: getRole(values.role),
+      id: member?.id,
+      input: {
+        name: values.name,
+        email: values.email,
+        role: getRole(values.role),
+      },
     });
     if (res.data) {
       SuccessNotification("Member updated", values.name);

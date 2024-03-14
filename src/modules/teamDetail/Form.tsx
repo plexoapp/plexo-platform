@@ -26,8 +26,10 @@ export const TitleForm = ({ team, isLoading }: TitleFormProps) => {
 
   const onUpdateTeam = async (values: typeof form.values) => {
     const res = await fetchUpdateTeam({
-      teamId: team?.id,
-      name: values.name,
+      id: team?.id,
+      input: {
+        name: values.name,
+      },
     });
 
     if (res.data) {

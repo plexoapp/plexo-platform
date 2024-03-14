@@ -23,8 +23,7 @@ import {
 import { TaskPriority } from "integration/graphql";
 import { useActions } from "lib/hooks/useActions";
 import { Task, TaskById } from "lib/types";
-import { statusName } from "./status";
-import { assigneesId } from "components/ui/Task/assignees";
+
 import { ErrorNotification, SuccessNotification } from "lib/notifications";
 
 const useStyles = createStyles(theme => ({
@@ -73,15 +72,15 @@ export const priorityLabel = (priority: TaskPriority | undefined) => {
 export const priorityName = (priority: TaskPriority | undefined) => {
   switch (priority) {
     case "NONE":
-      return "None";
+      return TaskPriority.None;
     case "LOW":
-      return "Low";
+      return TaskPriority.Low;
     case "MEDIUM":
-      return "Medium";
+      return TaskPriority.Medium;
     case "HIGH":
-      return "High";
+      return TaskPriority.High;
     case "URGENT":
-      return "Urgent";
+      return TaskPriority.Urgent;
   }
 };
 
@@ -175,15 +174,10 @@ export const GenericPriorityMenu = ({ children, onSelect, task }: GenericPriorit
 
   const onUpdateTaskPriority = async (priority: TaskPriority) => {
     const res = await fetchUpdateTask({
-      taskId: task?.id,
-      priority: priorityName(priority),
-      status: statusName(task?.status),
-      title: task?.title,
-      description: task?.description,
-      dueDate: task?.dueDate,
-      projectId: task?.project?.id,
-      leadId: task?.leader?.id,
-      assignees: assigneesId(task),
+      id: task?.id,
+      input: {
+        priority: priorityName(priority),
+      },
     });
 
     if (res.data) {
@@ -196,7 +190,7 @@ export const GenericPriorityMenu = ({ children, onSelect, task }: GenericPriorit
   return (
     <Menu shadow="md" width={180} position="bottom-start" withinPortal>
       <Menu.Target>
-        <Tooltip label="Set priority" position="bottom">
+        <Tooltip label="Change priority" position="bottom">
           {children}
         </Tooltip>
       </Menu.Target>

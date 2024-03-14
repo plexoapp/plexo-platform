@@ -11,6 +11,7 @@ import {
   ActionIcon,
   createStyles,
   Stack,
+  Collapse,
 } from "@mantine/core";
 import { DatePicker } from "@mantine/dates";
 import { useToggle } from "@mantine/hooks";
@@ -87,7 +88,7 @@ const NewTask = ({ newTaskOpened, setNewTaskOpened, createMore, setCreateMore }:
       pause: true,
       query: SuggestNewTaskDocument,
       variables: {
-        taskSuggestion: {
+        input: {
           title: title,
           description: description,
           dueDate: dueDate,
@@ -101,11 +102,11 @@ const NewTask = ({ newTaskOpened, setNewTaskOpened, createMore, setCreateMore }:
     if (taskSuggestionData) {
       const res = taskSuggestionData;
 
-      setTitle(res?.suggestNewTask.title || title);
-      setDescription(res?.suggestNewTask.description || description);
-      setStatus(res?.suggestNewTask.status || status);
-      setPriority(res?.suggestNewTask.priority || priority);
-      setDueDate(res?.suggestNewTask.dueDate || dueDate);
+      setTitle(res?.suggestNextTask.title || title);
+      setDescription(res?.suggestNextTask.description || description);
+      setStatus(res?.suggestNextTask.status || status);
+      setPriority(res?.suggestNextTask.priority || priority);
+      setDueDate(res?.suggestNextTask.dueDate || dueDate);
     }
   }, [taskSuggestionData]);
 
@@ -115,17 +116,19 @@ const NewTask = ({ newTaskOpened, setNewTaskOpened, createMore, setCreateMore }:
 
   const onCreateTask = async () => {
     const res = await fetchCreateTask({
-      title: title,
-      description: description.length ? description : null,
-      status: statusName(status),
-      priority: priorityName(priority),
-      dueDate: dueDate,
-      projectId: project?.id,
-      leadId: lead?.id,
-      labels: selectedLabels,
-      assignees: selectedAssignees,
-      subtasks: parseSubtasks(subtasks),
-      parentId: taskId,
+      input: {
+        title: title,
+        description: description.length ? description : null,
+        status: statusName(status),
+        priority: priorityName(priority),
+        dueDate: dueDate,
+        projectId: project?.id,
+        leadId: lead?.id,
+        labels: selectedLabels,
+        assignees: selectedAssignees,
+        subtasks: parseSubtasks(subtasks),
+        parentId: taskId,
+      },
     });
 
     if (res.data) {
@@ -238,7 +241,7 @@ const NewTask = ({ newTaskOpened, setNewTaskOpened, createMore, setCreateMore }:
           <ProjectSelector project={project} setProject={setProject} />
           <Popover position="bottom" shadow="md" withinPortal>
             <Popover.Target>
-              <Tooltip label="Set due date" position="bottom">
+              <Tooltip label="Change due date" position="bottom">
                 <Button
                   compact
                   variant="light"
@@ -253,19 +256,22 @@ const NewTask = ({ newTaskOpened, setNewTaskOpened, createMore, setCreateMore }:
               <DatePicker value={dueDate} onChange={setDueDate} />
             </Popover.Dropdown>
           </Popover>
-          <Button
-            compact
-            variant="light"
-            color={"gray"}
-            leftIcon={<Subtask size={16} />}
-            onClick={() => toggleSubtasks()}
-          >
-            <Text size={"xs"}>Subtasks</Text>
-          </Button>
+          <Tooltip label="Add subtasks" position="bottom">
+            <Button
+              compact
+              variant="light"
+              color={"gray"}
+              leftIcon={<Subtask size={16} />}
+              onClick={() => toggleSubtasks()}
+            >
+              <Text size={"xs"}>Subtasks</Text>
+            </Button>
+          </Tooltip>
         </Group>
       </Stack>
-
-      {showSubtasks && <NewSubTasks subtasks={subtasks} setSubtasks={setSubtasks} />}
+      <Collapse in={showSubtasks} transitionDuration={500}>
+        <NewSubTasks subtasks={subtasks} setSubtasks={setSubtasks} />
+      </Collapse>
       <Group
         pt={"md"}
         position="right"

@@ -40,12 +40,15 @@ export const MyMantineProvider = ({ children, colorScheme }: MantineProviderProp
             primaryColor: "brand",
             components: {
               Tooltip: {
-                styles: {
+                styles: theme => ({
                   tooltip: {
-                    marginTop: 5,
-                    fontSize: 12,
+                    fontSize: theme.fontSizes.xs,
+                    background:
+                      theme.colorScheme === "dark" ? theme.colors.dark[5] : theme.colors.gray[0],
+                    color:
+                      theme.colorScheme === "dark" ? theme.colors.gray[0] : theme.colors.dark[4],
                   },
-                },
+                }),
               },
             },
           }}

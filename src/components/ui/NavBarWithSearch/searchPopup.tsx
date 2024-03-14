@@ -61,7 +61,7 @@ const MySpotlightProvider = ({ children }: { children: ReactNode }) => {
           return {
             id: t.id,
             title: t.title,
-            description: t.description || "",
+            /* description: t.description || "", */
             onTrigger: () => router.push(`/tasks/${t.id}`),
             group: "tasks",
             status: t.status,

@@ -37,7 +37,7 @@ export const NewMemberModal = ({ opened, close }: { opened: boolean; close: () =
 
   return (
     <Modal opened={opened} onClose={close} title="Register New Member">
-      <form onSubmit={form.onSubmit(onCreateMember)}>
+      <form onSubmit={form.onSubmit(onCreateMember)} autoComplete="off">
         <Stack>
           <TextInput
             label="Name"

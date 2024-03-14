@@ -1,6 +1,7 @@
 // import { devtoolsExchange } from "@urql/devtools";
 import {
   cacheExchange,
+  Client,
   CombinedError,
   createClient,
   // dedupExchange,
@@ -10,56 +11,117 @@ import {
 } from "urql";
 import { createClient as createWSClient } from "graphql-ws";
 
-export const URQLClient = () => {
-  // console.log("CREATING URQL CLIENT");
+// export const URQLClient = (graphQLEndpoint: string, graphQLWsEndpoint: string) => {
+//   const GRAPHQL_ENDPOINT = graphQLEndpoint;
+//   const GRAPHQL_WS_ENDPOINT = graphQLWsEndpoint;
 
-  const GRAPHQL_ENDPOINT = process.env.NEXT_PUBLIC_GRAPHQL_ENDPOINT || "/graphql";
+//   // const wsClient =
+//   //   typeof window === "undefined"
+//   //     ? null
+//   //     : ;
 
-  const WS_ENDPOINT = process.env.NEXT_PUBLIC_WS_ENDPOINT || "/graphql/ws";
+//   // console.log(GRAPHQL_ENDPOINT);
 
-  // const wsClient =
-  //   typeof window === "undefined"
-  //     ? null
-  //     : ;
+//   return createClient({
+//     url: GRAPHQL_ENDPOINT,
+//     fetchOptions: {
+//       credentials: "include",
+//       headers: {
+//         // Authorization: PLEXO_TOKEN,
+//       },
+//     },
+//     exchanges: [
+//       // devtoolsExchange,
+//       // dedupExchange,
+//       cacheExchange,
+//       errorExchange({
+//         onError: (error: CombinedError) => {
+//           console.log({ error });
+//         },
+//       }),
+//       subscriptionExchange({
+//         forwardSubscription(request) {
+//           const input = { ...request, query: request.query || "" };
+//           return {
+//             subscribe(sink) {
+//               return {
+//                 unsubscribe: createWSClient({
+//                   url: GRAPHQL_WS_ENDPOINT,
+//                   connectionParams: {
+//                     Authorization: "",
+//                   },
+//                 }).subscribe(input, sink),
+//               };
+//             },
+//           };
+//         },
+//       }),
+//       fetchExchange,
+//     ],
+//     requestPolicy: "network-only",
+//   });
+// };
 
-  // console.log(GRAPHQL_ENDPOINT);
+// import { createClient } from 'urql';
 
-  return createClient({
-    url: GRAPHQL_ENDPOINT,
-    fetchOptions: {
-      credentials: "include",
-      headers: {
-        // Authorization: PLEXO_TOKEN,
-      },
-    },
-    exchanges: [
-      // devtoolsExchange,
-      // dedupExchange,
-      cacheExchange,
-      errorExchange({
-        onError: (error: CombinedError) => {
-          console.log({ error });
+class URQLClientSingleton {
+  private static instance: Client;
+  // private static endpoint = "";
+  // private static wsEndpoint = "";
+
+  public static getClient(graphQLEndpoint: string, graphQLWsEndpoint: string) {
+    const GRAPHQL_ENDPOINT = graphQLEndpoint;
+    const GRAPHQL_WS_ENDPOINT = graphQLWsEndpoint;
+
+    if (
+      !URQLClientSingleton.instance
+      // ||
+      // URQLClientSingleton.endpoint !== graphQLEndpoint ||
+      // URQLClientSingleton.wsEndpoint !== graphQLWsEndpoint
+    ) {
+      // URQLClientSingleton.endpoint = graphQLEndpoint;
+      // URQLClientSingleton.wsEndpoint = graphQLWsEndpoint;
+      URQLClientSingleton.instance = createClient({
+        url: GRAPHQL_ENDPOINT,
+        fetchOptions: {
+          credentials: "include",
+          headers: {
+            // Authorization: PLEXO_TOKEN,
+          },
         },
-      }),
-      subscriptionExchange({
-        forwardSubscription(request) {
-          const input = { ...request, query: request.query || "" };
-          return {
-            subscribe(sink) {
+        exchanges: [
+          // devtoolsExchange,
+          // dedupExchange,
+          cacheExchange,
+          errorExchange({
+            onError: (error: CombinedError) => {
+              console.log({ error });
+            },
+          }),
+          subscriptionExchange({
+            forwardSubscription(request) {
+              const input = { ...request, query: request.query || "" };
               return {
-                unsubscribe: createWSClient({
-                  url: WS_ENDPOINT,
-                  connectionParams: {
-                    Authorization: "",
-                  },
-                }).subscribe(input, sink),
+                subscribe(sink) {
+                  return {
+                    unsubscribe: createWSClient({
+                      url: GRAPHQL_WS_ENDPOINT,
+                      connectionParams: {
+                        Authorization: "",
+                      },
+                    }).subscribe(input, sink),
+                  };
+                },
               };
             },
-          };
-        },
-      }),
-      fetchExchange,
-    ],
-    requestPolicy: "network-only",
-  });
-};
+          }),
+          fetchExchange,
+        ],
+        requestPolicy: "network-only",
+      });
+    }
+    return URQLClientSingleton.instance;
+  }
+}
+
+export default URQLClientSingleton;

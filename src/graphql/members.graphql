@@ -5,25 +5,15 @@ query Members {
     updatedAt
     name
     email
+    role
     githubId
     googleId
     photoUrl
-    role
-
-    ownedTasks {
-      id
-    }
-    leadingTasks {
-      id
-    }
-    ownedProjects {
-      id
-    }
   }
 }
 
-mutation UpdateMember($memberId: UUID!, $name: String, $email: String, $role: String) {
-  updateMember(id: $memberId, name: $name, email: $email, role: $role) {
+mutation UpdateMember($id: UUID!, $input: UpdateMemberInput!) {
+  updateMember(id: $id, input: $input) {
     id
     name
     email

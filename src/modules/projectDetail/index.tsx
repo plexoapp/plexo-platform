@@ -25,6 +25,8 @@ import { ErrorNotification, SuccessNotification } from "lib/notifications";
 import { validateDate } from "lib/utils";
 import { TitleForm } from "./Form";
 import { DateGenericSelector } from "components/ui/DateGenericSelector";
+import { StatusSelectorByProject } from "components/ui/Project/status";
+import { VisibilitySelectorByProject } from "components/ui/Project/visibility";
 
 type ProjectDetailProps = {
   project: ProjectById | undefined;
@@ -58,8 +60,10 @@ const ProjectDetailContent = ({ project, isLoading }: ProjectDetailProps) => {
 
   const onUpdateProjectDueDate = async (date: Date | null) => {
     const res = await fetchUpdateProject({
-      projectId: project?.id,
-      dueDate: date === null ? new Date(0) : date,
+      id: project?.id,
+      input: {
+        dueDate: date === null ? new Date(0) : date,
+      },
     });
     if (res.data) {
       SuccessNotification("Due date updated", res.data.updateProject.name);
@@ -71,8 +75,10 @@ const ProjectDetailContent = ({ project, isLoading }: ProjectDetailProps) => {
 
   const onUpdateProjectStartDate = async (date: Date | null) => {
     const res = await fetchUpdateProject({
-      projectId: project?.id,
-      startDate: date === null ? new Date(0) : date,
+      id: project?.id,
+      input: {
+        startDate: date === null ? new Date(0) : date,
+      },
     });
     if (res.data) {
       SuccessNotification("Start date updated", res.data.updateProject.name);
@@ -141,9 +147,11 @@ const ProjectDetailContent = ({ project, isLoading }: ProjectDetailProps) => {
               </Box>
             ) : (
               <Group spacing={5} className={classes.propsBar}>
+                <StatusSelectorByProject project={project} type="button" />
                 <LeadSelectorByProject project={project} />
                 <MemberSelectorByProject project={project} />
                 <TeamSelectorByProject project={project} />
+                <VisibilitySelectorByProject project={project} type="button" />
                 <DateGenericSelector
                   placeholder={"Set start date"}
                   date={startDate}
@@ -184,6 +192,16 @@ const ProjectDetailContent = ({ project, isLoading }: ProjectDetailProps) => {
           <Divider />
           <Group>
             <Text w={90} lineClamp={1} size={"sm"} color={"dimmed"}>
+              Status
+            </Text>
+            {isLoading ? (
+              <Skeleton height={26} width={100} />
+            ) : (
+              <StatusSelectorByProject project={project} type="button" />
+            )}
+          </Group>
+          <Group>
+            <Text w={90} lineClamp={1} size={"sm"} color={"dimmed"}>
               Lead
             </Text>
             {isLoading ? (
@@ -212,6 +230,17 @@ const ProjectDetailContent = ({ project, isLoading }: ProjectDetailProps) => {
               <TeamSelectorByProject project={project} />
             )}
           </Group>
+          <Group>
+            <Text w={90} lineClamp={1} size={"sm"} color={"dimmed"}>
+              Visibility
+            </Text>
+            {isLoading ? (
+              <Skeleton height={26} width={100} />
+            ) : (
+              <VisibilitySelectorByProject project={project} type="button" />
+            )}
+          </Group>
+
           <Group>
             <Text w={90} lineClamp={1} size={"sm"} color={"dimmed"}>
               Start Date

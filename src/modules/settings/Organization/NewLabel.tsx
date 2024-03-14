@@ -21,9 +21,11 @@ export const NewLabel = ({ opened, close }: { opened: boolean; close: () => void
 
   const onCreateLabel = async (values: typeof form.values) => {
     const res = await fetchCreateLabel({
-      name: values.name,
-      description: values.description,
-      color: values.color,
+      input: {
+        name: values.name,
+        description: values.description,
+        color: values.color,
+      },
     });
     if (res.data) {
       SuccessNotification("Saved!", "The label has been created.");

@@ -345,10 +345,11 @@ const STORAGE_KEY = "filterValues";
 
 export const TasksPageContent = () => {
   const { classes, theme } = useStyles();
-  const { setNavBarOpened, setTasks } = usePlexoContext();
+  const { setNavBarOpened, setTasks, authCookie } = usePlexoContext();
   const [viewMode, setViewMode] = useState<"list" | "columns">("list");
 
   const [{ data: tasksData, fetching: isFetchingTasksData }] = useQuery({
+    pause: authCookie ? false : true,
     query: TasksDocument,
   });
 

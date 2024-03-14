@@ -32,8 +32,10 @@ export const PasswordForm = ({ opened, close }: PasswordFormProps) => {
 
   const onUpdatePassword = async (values: typeof form.values) => {
     const res = await updatePassword({
-      currentPassword: values.currentPassword,
-      newPassword: values.newPassword,
+      input: {
+        currentPassword: values.currentPassword,
+        newPassword: values.newPassword,
+      },
     });
 
     if (res.data) {

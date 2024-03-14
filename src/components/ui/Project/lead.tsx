@@ -13,9 +13,8 @@ import { showNotification } from "@mantine/notifications";
 import { Check, X } from "tabler-icons-react";
 import { useEffect, useState } from "react";
 
-import { Member, Project } from "lib/types";
+import { Member, Project, ProjectById } from "lib/types";
 import { useActions } from "lib/hooks/useActions";
-import { ProjectById } from "lib/types";
 import { noMemberId } from "../constant";
 import { MemberPhoto } from "../MemberPhoto";
 import { usePlexoContext } from "context/PlexoContext";
@@ -50,12 +49,14 @@ export const GenericLeadProjectMenu = ({
   const [searchValue, setSearchValue] = useState("");
   const [leadOptions, setLeadOptions] = useState<Member[]>([]);
 
-  const memberName = project?.leader?.name ? project?.leader?.name : selectedLead?.name;
+  const memberName = project?.lead?.name ? project?.lead?.name : selectedLead?.name;
 
   const onUpdateProjectLead = async (leadId: string) => {
     const res = await fetchUpdateProject({
-      projectId: project?.id,
-      leadId: leadId,
+      id: project?.id,
+      input: {
+        leadId: leadId,
+      },
     });
 
     if (res.data) {
@@ -185,9 +186,9 @@ export const LeadSelectorByProject = ({ project }: LeadSelectorByProjectProps) =
         compact
         variant="light"
         color={"gray"}
-        leftIcon={MemberPhoto(project?.leader?.photoUrl)}
+        leftIcon={MemberPhoto(project?.lead?.photoUrl)}
       >
-        <Text size={"xs"}>{LeadName(project?.leader)}</Text>
+        <Text size={"xs"}>{LeadName(project?.lead)}</Text>
       </Button>
     </GenericLeadProjectMenu>
   );

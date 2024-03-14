@@ -34,9 +34,11 @@ export const EditProfileForm = ({ userData, opened, close }: EditProfileFormProp
 
   const onUdateProfile = async (values: typeof form.values) => {
     const res = await updateProfile({
-      ...(values.name !== userData?.name && { name: values.name }),
-      ...(values.email !== userData?.email && { email: values.email }),
-      ...(values.photoUrl !== userData?.photoUrl && { photoUrl: values.photoUrl }),
+      input: {
+        ...(values.name !== userData?.name && { name: values.name }),
+        ...(values.email !== userData?.email && { email: values.email }),
+        ...(values.photoUrl !== userData?.photoUrl && { photoUrl: values.photoUrl }),
+      },
     });
 
     if (res.data) {

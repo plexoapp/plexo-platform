@@ -21,6 +21,8 @@ import { Member } from "lib/types";
 import { TeamSelector } from "./team";
 import { LeadProjectSelector } from "./lead";
 import { MemberSelector } from "./members";
+import { StatusProjectSelector } from "./status";
+import { ProjectStatus } from "integration/graphql";
 
 type NewProjectProps = {
   newProjectOpened: boolean;
@@ -43,6 +45,7 @@ const NewProject = ({ newProjectOpened, setNewProjectOpened }: NewProjectProps) 
   const [name, setName] = useState("");
   const [prefix, setPrefix] = useState("");
   const [description, setDescription] = useState("");
+  const [status, setStatus] = useState<ProjectStatus>(ProjectStatus.None);
   const [lead, setLead] = useState<Member | null>(null);
   const [dueDate, setDueDate] = useState<Date | null>(null);
   const [startDate, setStartDate] = useState<Date | null>(null);
@@ -53,14 +56,17 @@ const NewProject = ({ newProjectOpened, setNewProjectOpened }: NewProjectProps) 
 
   const onCreateProject = async () => {
     const res = await fetchCreateProject({
-      name: name,
-      prefix: prefix,
-      description: description.length ? description : null,
-      leadId: lead?.id,
-      dueDate: dueDate,
-      startDate: startDate,
-      members: members,
-      teams: teams,
+      input: {
+        name: name,
+        prefix: prefix,
+        description: description.length ? description : null,
+        status: status,
+        leadId: lead?.id,
+        startDate: startDate,
+        dueDate: dueDate,
+        members: members,
+        teams: teams,
+      },
     });
 
     if (res.data) {
@@ -89,6 +95,7 @@ const NewProject = ({ newProjectOpened, setNewProjectOpened }: NewProjectProps) 
     setName("");
     setPrefix("");
     setDescription("");
+    setStatus(ProjectStatus.None);
     setLead(null);
     setDueDate(null);
     setStartDate(null);
@@ -141,6 +148,7 @@ const NewProject = ({ newProjectOpened, setNewProjectOpened }: NewProjectProps) 
           }}
         />
         <Group spacing={6} mb={"md"}>
+          <StatusProjectSelector status={status} setStatus={setStatus} type="button" />
           <LeadProjectSelector lead={lead} setLead={setLead} />
           <MemberSelector members={members} setMembers={setMembers} />
           <TeamSelector teams={teams} setTeams={setTeams} />

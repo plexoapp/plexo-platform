@@ -26,7 +26,7 @@ const TeamPage: NextPageWithLayout = () => {
     }
   }, [router, plexo.authCookie]);
 
-  return <TeamDetailPageContent team={teamData?.teamById} isLoading={isLoadingTeam} />;
+  return <TeamDetailPageContent team={teamData?.team} isLoading={isLoadingTeam} />;
 };
 
 TeamPage.getLayout = function getLayout(page: ReactElement) {

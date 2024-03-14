@@ -4,17 +4,18 @@ query User {
     name
     email
     photoUrl
+    role
   }
 }
 
-mutation UpdateProfile($name: String, $email: String, $photoUrl: String) {
-  updateProfile(name: $name, email: $email, photoUrl: $photoUrl) {
+mutation UpdateProfile($input: UpdateProfileInput!) {
+  updateProfile(input: $input) {
     name
   }
 }
 
-mutation UpdatePassword($currentPassword: String!, $newPassword: String!) {
-  updatePassword(currentPassword: $currentPassword, newPassword: $newPassword) {
+mutation UpdatePassword($input: UpdatePasswordInput!) {
+  updatePassword(input: $input) {
     name
   }
 }

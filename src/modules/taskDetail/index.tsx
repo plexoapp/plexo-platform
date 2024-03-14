@@ -33,7 +33,7 @@ import {
   statusName,
 } from "components/ui/Task/status";
 import { LabelsSelectorBytask } from "components/ui/Task/labels";
-import { assigneesId, AssigneesSelectorByTask } from "components/ui/Task/assignees";
+import { AssigneesSelectorByTask } from "components/ui/Task/assignees";
 import { TaskMenu } from "components/ui/Task/menu";
 import { Task, TaskById, TaskSuggestion } from "lib/types";
 import { useActions } from "lib/hooks/useActions";
@@ -105,7 +105,9 @@ const SuggestionTasks = ({
 
   const onCreateTasks = async () => {
     const res = await fetchCreateTasks({
-      tasks: parseSubtasks(tasksSuggestion, parentTask),
+      input: {
+        tasks: parseSubtasks(tasksSuggestion, parentTask),
+      },
     });
 
     if (res.data) {
@@ -191,8 +193,10 @@ const SubTasks = ({ task }: { task: TaskById | undefined }) => {
     pause: true,
     query: SubdivideTaskDocument,
     variables: {
-      taskId: task?.id,
-      count: 2,
+      input: {
+        taskId: task?.id,
+        subtasks: 2,
+      },
     },
   });
 
@@ -262,15 +266,10 @@ const TaskDetailPageContent = ({ task, isLoading }: TaskDetailProps) => {
 
   const onUpdateTaskDueDate = async (dueDate: Date | null) => {
     const res = await fetchUpdateTask({
-      taskId: task?.id,
-      status: statusName(task?.status),
-      priority: priorityName(task?.priority),
-      title: task?.title,
-      description: task?.description,
-      dueDate: dueDate === null ? new Date(0) : dueDate,
-      projectId: task?.project?.id,
-      leadId: task?.leader?.id,
-      assignees: assigneesId(task),
+      id: task?.id,
+      input: {
+        dueDate: dueDate === null ? new Date(0) : dueDate,
+      },
     });
 
     if (res.data) {

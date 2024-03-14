@@ -27,7 +27,7 @@ const ProjectPage: NextPageWithLayout = () => {
     }
   }, [router, plexo.authCookie]);
 
-  return <ProjectDetailContent project={projectData?.projectById} isLoading={isLoadingProject} />;
+  return <ProjectDetailContent project={projectData?.project} isLoading={isLoadingProject} />;
 };
 
 ProjectPage.getLayout = function getLayout(page: ReactElement) {

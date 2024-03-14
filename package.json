@@ -1,12 +1,12 @@
 {
   "name": "plexo-platform",
-  "version": "0.1.12",
+  "version": "0.2.8",
   "private": false,
   "scripts": {
     "generate": "graphql-codegen -c codegen.yml",
     "format": "prettier --write '**/*.{ts,tsx,graphql}'",
     "dev": "next dev",
-    "build": "next build && next export",
+    "build": "next build",
     "start": "next start",
     "lint": "next lint"
   },
@@ -24,6 +24,7 @@
     "@mantine/spotlight": "^6.0.20",
     "@tabler/icons": "^2.23.0",
     "@tabler/icons-react": "^2.23.0",
+    "@types/uuid": "^9.0.8",
     "@urql/devtools": "2.0.3",
     "cookies-next": "^2.1.1",
     "dayjs": "^1.11.7",
@@ -36,7 +37,8 @@
     "react-beautiful-dnd": "^13.1.1",
     "react-dom": "18.2.0",
     "tabler-icons-react": "^1.56.0",
-    "urql": "4.0.4"
+    "urql": "4.0.4",
+    "uuid": "^9.0.1"
   },
   "devDependencies": {
     "@graphql-codegen/cli": "4.0.1",

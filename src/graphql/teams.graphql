@@ -1,4 +1,5 @@
 query Teams {
+  #UPDATED
   teams {
     id
     createdAt
@@ -6,7 +7,6 @@ query Teams {
     name
     ownerId
     visibility
-
     owner {
       id
     }
@@ -16,12 +16,13 @@ query Teams {
     }
   }
 }
-
 query TeamById($teamId: UUID!) {
-  teamById(id: $teamId) {
+  #UPDATED
+  team(id: $teamId) {
     id
     name
     prefix
+    visibility
     members {
       id
       name
@@ -32,21 +33,9 @@ query TeamById($teamId: UUID!) {
     }
   }
 }
-
-mutation NewTeam(
-  $name: String!
-  # $visibility: String
-  $prefix: String
-  $members: [UUID!]
-  $projects: [UUID!]
-) {
-  createTeam(
-    name: $name
-    # visibility: $visibility
-    prefix: $prefix
-    members: $members
-    projects: $projects
-  ) {
+mutation NewTeam($input: CreateTeamInput!) {
+  #UPDATED
+  createTeam(input: $input) {
     id
     name
   }
@@ -59,8 +48,8 @@ mutation DeleteTeam($teamId: UUID!) {
   }
 }
 
-mutation UpdateTeam($teamId: UUID!, $name: String, $members: [UUID!], $projects: [UUID!]) {
-  updateTeam(id: $teamId, name: $name, members: $members, projects: $projects) {
+mutation UpdateTeam($id: UUID!, $input: UpdateTeamInput!) {
+  updateTeam(id: $id, input: $input) {
     id
     name
   }

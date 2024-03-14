@@ -31,9 +31,11 @@ export const TitleForm = ({ project, isLoading }: TitleFormProps) => {
 
   const onUpdateProject = async (values: typeof form.values) => {
     const res = await fetchUpdateProject({
-      projectId: project?.id,
-      name: values.name,
-      description: values.description,
+      id: project?.id,
+      input: {
+        name: values.name,
+        description: values.description,
+      },
     });
 
     if (res.data) {

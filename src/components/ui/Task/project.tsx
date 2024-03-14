@@ -17,9 +17,7 @@ import { useEffect, useState } from "react";
 
 import { Project, TaskById } from "lib/types";
 import { useActions } from "lib/hooks/useActions";
-import { statusName } from "./status";
-import { priorityName } from "./priority";
-import { assigneesId } from "./assignees";
+
 import { ErrorNotification, SuccessNotification } from "lib/notifications";
 import { noMemberId } from "../constant";
 import { usePlexoContext } from "context/PlexoContext";
@@ -131,15 +129,10 @@ export const GenericProjectsMenu = ({ children, onSelect, task }: GenericProject
 
   const onUpdateTaskProject = async (projectId: string) => {
     const res = await fetchUpdateTask({
-      taskId: task?.id,
-      projectId: projectId,
-      priority: priorityName(task?.priority),
-      status: statusName(task?.status),
-      title: task?.title,
-      description: task?.description,
-      dueDate: task?.dueDate,
-      leadId: task?.leader?.id,
-      assignees: assigneesId(task),
+      id: task?.id,
+      input: {
+        projectId: projectId,
+      },
     });
 
     if (res.data) {

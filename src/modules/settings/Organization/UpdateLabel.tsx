@@ -31,10 +31,12 @@ export const UpdateLabel = ({
 
   const onUpdateLabel = async (values: typeof form.values) => {
     const res = await fetchUpdateLabel({
-      labelId: label?.id,
-      name: values.name,
-      description: values.description,
-      color: values.color,
+      id: label?.id,
+      input: {
+        name: values.name,
+        description: values.description,
+        color: values.color,
+      },
     });
     if (res.data) {
       SuccessNotification("Saved!", "The label has been updated.");

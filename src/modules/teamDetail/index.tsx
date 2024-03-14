@@ -19,6 +19,7 @@ import { TeamMenu } from "components/ui/Team/menu";
 import { MemberSelectorByTeam } from "components/ui/Project/members";
 import { ProjectsSelectorByTeam } from "components/ui/Team/projects";
 import { TitleForm } from "./Form";
+import { VisibilitySelectorByTeam } from "components/ui/Team/visibility";
 
 const useStyles = createStyles(theme => ({
   propsSection: {
@@ -90,6 +91,7 @@ const TeamDetailPageContent = ({ team, isLoading }: TeamDetailProps) => {
               <Group spacing={5} className={classes.propsBar}>
                 <MemberSelectorByTeam team={team} />
                 <ProjectsSelectorByTeam team={team} />
+                <VisibilitySelectorByTeam team={team} type="button" />
               </Group>
             )}
           </Stack>
@@ -137,6 +139,16 @@ const TeamDetailPageContent = ({ team, isLoading }: TeamDetailProps) => {
               <Skeleton height={26} width={100} />
             ) : (
               <ProjectsSelectorByTeam team={team} />
+            )}
+          </Group>
+          <Group>
+            <Text w={90} lineClamp={1} size={"sm"} color={"dimmed"}>
+              Visibility
+            </Text>
+            {isLoading ? (
+              <Skeleton height={26} width={100} />
+            ) : (
+              <VisibilitySelectorByTeam team={team} type="button" />
             )}
           </Group>
         </Stack>

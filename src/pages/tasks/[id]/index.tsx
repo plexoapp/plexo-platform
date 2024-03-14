@@ -26,7 +26,7 @@ const TaskPage: NextPageWithLayout = () => {
     }
   }, [router, plexo.authCookie]);
 
-  return <TaskDetailPageContent task={taskData?.taskById} isLoading={isLoadingTask} />;
+  return <TaskDetailPageContent task={taskData?.task} isLoading={isLoadingTask} />;
 };
 
 TaskPage.getLayout = function getLayout(page: ReactElement) {

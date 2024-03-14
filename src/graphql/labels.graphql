@@ -1,5 +1,5 @@
 query Labels {
-  labels{
+  labels {
     id
     name
     description
@@ -8,8 +8,8 @@ query Labels {
   }
 }
 
-mutation CreateLabel($name: String!, $color: String, $description: String) {
-  createLabel(name: $name, color: $color, description: $description) {
+mutation CreateLabel($input: CreateLabelInput!) {
+  createLabel(input: $input) {
     id
     name
     color
@@ -17,8 +17,8 @@ mutation CreateLabel($name: String!, $color: String, $description: String) {
   }
 }
 
-mutation UpdateLabel($labelId: UUID!, $name: String, $color: String, $description: String) {
-  updateLabel(id: $labelId, name: $name, color: $color, description: $description) {
+mutation UpdateLabel($id: UUID!, $input: UpdateLabelInput!) {
+  updateLabel(id: $id, input: $input) {
     id
     name
     color

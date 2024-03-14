@@ -11,9 +11,10 @@ import {
   Group,
   ScrollArea,
   Divider,
+  Box,
 } from "@mantine/core";
 import { Affiliate } from "tabler-icons-react";
-import { useEffect, useState } from "react";
+import { ChangeEvent, useEffect, useState } from "react";
 
 import { ProjectById, Team } from "lib/types";
 import { useActions } from "lib/hooks/useActions";
@@ -23,6 +24,21 @@ import { usePlexoContext } from "context/PlexoContext";
 const useStyles = createStyles(theme => ({
   checkbox: {
     width: "100%",
+  },
+  checkboxBody: {
+    alignItems: "center",
+  },
+  checkboxLabel: {
+    fontSize: 14,
+    paddingLeft: 10,
+  },
+  checkboxInner: {
+    width: 20,
+    height: 20,
+  },
+  checkboxInput: {
+    width: "100%",
+    height: "100%",
   },
 }));
 
@@ -105,20 +121,12 @@ type GenericTeamsMenuProps = {
   children: React.ReactNode;
   selectedTeams?: string[];
   setSelectedTeams?: (teams: string[]) => void;
-  project?: ProjectById;
 };
 
-export const GenericTeamMenu = ({
-  children,
-  selectedTeams,
-  setSelectedTeams,
-  project,
-}: GenericTeamsMenuProps) => {
+const GenericTeamMenu = ({ children, selectedTeams, setSelectedTeams }: GenericTeamsMenuProps) => {
   const { teamsData, isLoadingTeams } = usePlexoContext();
   const [searchValue, setSearchValue] = useState("");
   const [teamsOptions, setTeamsOptions] = useState<Team[]>([]);
-  const [teams, setTeams] = useState<string[] | null>(null);
-  const { fetchUpdateProject } = useActions();
 
   useEffect(() => {
     if (teamsData) {
@@ -130,15 +138,100 @@ export const GenericTeamMenu = ({
             )
           );
     }
-  }, [searchValue]);
+  }, [teamsData, searchValue]);
 
-  const labelValue = selectedTeams ? selectedTeams : teams ? teams : teamsId(project);
-  const onChangeLabel = selectedTeams ? setSelectedTeams : setTeams;
+  return (
+    <Menu shadow="md" closeOnItemClick={false} position="bottom-start" withinPortal>
+      <Menu.Target>
+        <Tooltip label="Change teams" position="bottom">
+          {children}
+        </Tooltip>
+      </Menu.Target>
 
-  const onUpdateProjectTeams = async (members: string[]) => {
+      <Menu.Dropdown>
+        <TextInput
+          placeholder="Set team..."
+          variant="filled"
+          value={searchValue}
+          onChange={event => setSearchValue(event.currentTarget.value)}
+          rightSection={<Kbd px={8}>T</Kbd>}
+        ></TextInput>
+        <Menu.Divider />
+        {isLoadingTeams ? (
+          <Skeleton height={36} radius="sm" />
+        ) : (
+          <Checkbox.Group mt={10} value={selectedTeams} onChange={setSelectedTeams}>
+            {teamsOptions.map((t: Team) => {
+              return (
+                <Menu.Item key={t.id}>
+                  <Checkbox
+                    size="xs"
+                    value={t.id}
+                    label={TeamName(t)}
+                    styles={{
+                      body: {
+                        alignItems: "center",
+                      },
+                      label: {
+                        paddingLeft: 10,
+                      },
+                    }}
+                  />
+                </Menu.Item>
+              );
+            })}
+          </Checkbox.Group>
+        )}
+      </Menu.Dropdown>
+    </Menu>
+  );
+};
+
+type TeamsByProjectMenuProps = {
+  children: React.ReactNode;
+  project?: ProjectById;
+};
+
+const TeamByProjectMenu = ({ children, project }: TeamsByProjectMenuProps) => {
+  const { classes } = useStyles();
+  const { teamsData, isLoadingTeams } = usePlexoContext();
+  const { fetchUpdateProject } = useActions();
+
+  const [searchValue, setSearchValue] = useState("");
+  const [teamsOptions, setTeamsOptions] = useState<Team[]>([]);
+  const [selectedTeams, setSelectedTeams] = useState<string[]>([]);
+
+  useEffect(() => {
+    if (teamsData) {
+      searchValue == ""
+        ? setTeamsOptions(teamsData)
+        : setTeamsOptions(
+            teamsData?.filter((item: Team) =>
+              item.name.toLowerCase().includes(searchValue.toLowerCase())
+            )
+          );
+    }
+  }, [teamsData, searchValue]);
+
+  useEffect(() => {
+    if (project && project.teams) {
+      const teamsIds = project.teams.map(a => a.id as string);
+
+      setSelectedTeams(teamsIds);
+    }
+  }, [project]);
+
+  const onUpdateProjectTeams = async (event: ChangeEvent<HTMLInputElement>) => {
+    const { checked, value } = event.currentTarget;
+    setSelectedTeams(checked ? [...selectedTeams, value] : selectedTeams.filter(a => a !== value));
     const res = await fetchUpdateProject({
-      projectId: project?.id,
-      teams: teams,
+      id: project?.id,
+      input: {
+        teams: {
+          add: checked ? [value] : [],
+          remove: checked ? [] : [value],
+        },
+      },
     });
 
     if (res.data) {
@@ -148,12 +241,6 @@ export const GenericTeamMenu = ({
       ErrorNotification();
     }
   };
-
-  useEffect(() => {
-    if (teams) {
-      onUpdateProjectTeams(teams);
-    }
-  }, [teams]);
 
   return (
     <Menu shadow="md" closeOnItemClick={false} position="bottom-start" withinPortal>
@@ -175,7 +262,7 @@ export const GenericTeamMenu = ({
         {isLoadingTeams ? (
           <Skeleton height={36} radius="sm" />
         ) : (
-          <Checkbox.Group mt={10} value={labelValue} onChange={onChangeLabel}>
+          <Box mt={10}>
             {teamsOptions.map((t: Team) => {
               return (
                 <Menu.Item key={t.id}>
@@ -183,19 +270,19 @@ export const GenericTeamMenu = ({
                     size="xs"
                     value={t.id}
                     label={TeamName(t)}
-                    styles={{
-                      body: {
-                        alignItems: "center",
-                      },
-                      label: {
-                        paddingLeft: 10,
-                      },
+                    checked={selectedTeams.includes(t.id)}
+                    onChange={event => onUpdateProjectTeams(event)}
+                    classNames={{
+                      body: classes.checkboxBody,
+                      label: classes.checkboxLabel,
+                      inner: classes.checkboxInner,
+                      input: classes.checkboxInput,
                     }}
                   />
                 </Menu.Item>
               );
             })}
-          </Checkbox.Group>
+          </Box>
         )}
       </Menu.Dropdown>
     </Menu>
@@ -223,10 +310,10 @@ type TeamSelectorByProjectProps = {
 
 export const TeamSelectorByProject = ({ project }: TeamSelectorByProjectProps) => {
   return (
-    <GenericTeamMenu project={project}>
+    <TeamByProjectMenu project={project}>
       <Button compact variant="light" color={"gray"} leftIcon={<TeamIcon />}>
         <Text size={"xs"}>{TeamLabel(project?.teams.length)}</Text>
       </Button>
-    </GenericTeamMenu>
+    </TeamByProjectMenu>
   );
 };

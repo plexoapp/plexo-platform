@@ -18,13 +18,16 @@ import { useForm } from "@mantine/form";
 import { loginWithEmail } from "lib/auth";
 import { useEffect, useState } from "react";
 import { usePlexoContext } from "context/PlexoContext";
-
-// import Cookies from 'cookies'
+// import { InferGetServerSidePropsType } from "next";
 
 type AuthResponse = {
   error: boolean;
   message: any;
 };
+
+// {
+//   plexoAPIEndpoint,
+// }: InferGetServerSidePropsType<typeof getServerSideProps>
 
 const LoginPage = () => {
   const { colorScheme } = useMantineColorScheme();
@@ -54,11 +57,14 @@ const LoginPage = () => {
     },
   });
 
+  const loginEmailEndpoint = `${plexo.plexoAPIEndpoint}/auth/email/login`;
+  const loginGithubEndpoint = `${plexo.plexoAPIEndpoint}/auth/github`;
+
   const onLogin = async (values: typeof form.values) => {
     setLoading(true);
     setAuthResponse(undefined);
 
-    const response = await loginWithEmail({
+    const response = await loginWithEmail(loginEmailEndpoint, {
       email: values.email,
       password: values.password,
     });
@@ -68,11 +74,7 @@ const LoginPage = () => {
 
     //Login successful
     if (response && !response.error) {
-      // console.log("response: ", response.message);
       plexo.setAuthCookie(response.message.access_token);
-
-      // router.replace("/", undefined, { shallow: true });
-      // router.reload();
     }
   };
 
@@ -118,8 +120,9 @@ const LoginPage = () => {
             <Divider label="Or, continue with" labelPosition="center" />
 
             <Button
+              disabled
               component="a"
-              href={process.env.NEXT_PUBLIC_URL_AUTH || "/auth/github"}
+              href={loginGithubEndpoint}
               leftIcon={<BrandGithub />}
               color="dark"
             >
@@ -131,5 +134,16 @@ const LoginPage = () => {
     </Center>
   );
 };
+
+// export const getServerSideProps = async () => {
+//   console.log("getServerSideProps");
+//   console.log(process.env.PLEXO_API_ENDPOINT);
+
+//   return {
+//     props: {
+//       plexoAPIEndpoint: process.env.PLEXO_API_ENDPOINT,
+//     },
+//   };
+// };
 
 export default LoginPage;

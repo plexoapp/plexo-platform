@@ -10,7 +10,7 @@ query Projects {
     leadId
     startDate
     dueDate
-
+    status
     owner {
       id
     }
@@ -22,7 +22,7 @@ query Projects {
       id
       name
     }
-    leader {
+    lead {
       id
       name
       photoUrl
@@ -30,23 +30,8 @@ query Projects {
   }
 }
 
-subscription ProjectsSubscription {
-  projects {
-    id
-    name
-    prefix
-    description
-    createdAt
-    updatedAt
-    startDate
-    dueDate
-    ownerId
-    leadId
-  }
-}
-
 query ProjectById($projectId: UUID!) {
-  projectById(id: $projectId) {
+  project(id: $projectId) {
     id
     name
     prefix
@@ -54,11 +39,13 @@ query ProjectById($projectId: UUID!) {
     leadId
     startDate
     dueDate
+    status
+    visibility
     owner {
       id
       name
     }
-    leader {
+    lead {
       id
       name
       photoUrl
@@ -78,26 +65,8 @@ query ProjectById($projectId: UUID!) {
   }
 }
 
-mutation NewProject(
-  $name: String!
-  $prefix: String
-  $description: String
-  $leadId: UUID
-  $startDate: DateTime
-  $dueDate: DateTime
-  $members: [UUID!]
-  $teams: [UUID!]
-) {
-  createProject(
-    name: $name
-    prefix: $prefix
-    description: $description
-    leadId: $leadId
-    startDate: $startDate
-    dueDate: $dueDate
-    members: $members
-    teams: $teams
-  ) {
+mutation NewProject($input: CreateProjectInput!) {
+  createProject(input: $input) {
     id
     name
   }
@@ -110,27 +79,24 @@ mutation DeleteProject($projectId: UUID!) {
   }
 }
 
-mutation UpdateProject(
-  $projectId: UUID!
-  $name: String
-  $description: String
-  $startDate: DateTime
-  $dueDate: DateTime
-  $leadId: UUID
-  $members: [UUID!]
-  $teams: [UUID!]
-) {
-  updateProject(
-    id: $projectId
-    name: $name
-    description: $description
-    startDate: $startDate
-    dueDate: $dueDate
-    leadId: $leadId
-    members: $members
-    teams: $teams
-  ) {
+mutation UpdateProject($id: UUID!, $input: UpdateProjectInput!) {
+  updateProject(id: $id, input: $input) {
     id
     name
+  }
+}
+
+query SuggestProject($input: ProjectSuggestionInput!) {
+  suggestNextProject(input: $input) {
+    name
+    status
+    visibility
+    description
+    tasks {
+      title
+      description
+      status
+      priority
+    }
   }
 }

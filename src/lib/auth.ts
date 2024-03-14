@@ -1,6 +1,7 @@
-const loginURL = process.env.NEXT_PUBLIC_URL_EMAIL_AUTH || "/api/auth/email/login";
-
-export const loginWithEmail = async ({ email, password }: { email: string; password: string }) => {
+export const loginWithEmail = async (
+  loginURL: string,
+  { email, password }: { email: string; password: string }
+) => {
   try {
     const res = await fetch(loginURL, {
       method: "POST",
