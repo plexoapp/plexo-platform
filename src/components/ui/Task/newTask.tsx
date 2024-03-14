@@ -11,6 +11,7 @@ import {
   ActionIcon,
   createStyles,
   Stack,
+  Collapse,
 } from "@mantine/core";
 import { DatePicker } from "@mantine/dates";
 import { useToggle } from "@mantine/hooks";
@@ -268,8 +269,9 @@ const NewTask = ({ newTaskOpened, setNewTaskOpened, createMore, setCreateMore }:
           </Tooltip>
         </Group>
       </Stack>
-
-      {showSubtasks && <NewSubTasks subtasks={subtasks} setSubtasks={setSubtasks} />}
+      <Collapse in={showSubtasks} transitionDuration={500}>
+        <NewSubTasks subtasks={subtasks} setSubtasks={setSubtasks} />
+      </Collapse>
       <Group
         pt={"md"}
         position="right"

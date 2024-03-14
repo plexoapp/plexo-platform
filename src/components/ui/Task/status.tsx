@@ -28,6 +28,7 @@ import { useState, useEffect } from "react";
 import { Task, TaskById } from "lib/types";
 import { useActions } from "lib/hooks/useActions";
 import { ErrorNotification, SuccessNotification } from "lib/notifications";
+import { ProjectTask } from "../Project/DesignProject/projectTasks";
 
 const useStyles = createStyles(theme => ({
   checkbox: {
@@ -171,7 +172,7 @@ export const StatusCheckboxGroup = ({ statusFilters, setStatusFilters }: StatusC
 
 type GenericStatusMenuProps = {
   children: React.ReactNode;
-  onSelect?: (priority: TaskStatus) => void;
+  onSelect?: (status: TaskStatus) => void;
   task?: TaskById | Task | undefined;
 };
 
@@ -236,6 +237,82 @@ export const GenericStatusMenu = ({ children, onSelect, task }: GenericStatusMen
         })}
       </Menu.Dropdown>
     </Menu>
+  );
+};
+
+type ManualStatusMenuProps = {
+  children: React.ReactNode;
+  task: ProjectTask;
+  tasks: ProjectTask[];
+  setTasks: (subtasks: ProjectTask[]) => void;
+};
+
+export const ManualStatusMenu = ({ children, task, tasks, setTasks }: ManualStatusMenuProps) => {
+  const theme = useMantineTheme();
+  const [searchValue, setSearchValue] = useState("");
+  const [statusOptions, setStatusOptions] = useState<TaskStatus[]>([]);
+
+  useEffect(() => {
+    const statusValues = Object.values(TaskStatus);
+    setStatusOptions(
+      statusValues.sort(statusOrder).filter(item => item.includes(searchValue.toUpperCase()))
+    );
+  }, [searchValue]);
+
+  const onUpdateTaskStatus = async (status: TaskStatus) => {
+    const updatedTasks = tasks.map(t => {
+      return task.id == t.id ? { ...t, status: status } : t;
+    });
+    setTasks(updatedTasks);
+  };
+
+  return (
+    <Menu shadow="md" width={180} position="bottom-start" withinPortal>
+      <Menu.Target>
+        <Tooltip label="Change status" position="bottom">
+          {children}
+        </Tooltip>
+      </Menu.Target>
+      <Menu.Dropdown>
+        <TextInput
+          placeholder="Change Status..."
+          variant="filled"
+          value={searchValue}
+          onChange={event => setSearchValue(event.currentTarget.value)}
+          rightSection={<Kbd px={8}>S</Kbd>}
+        />
+        <Menu.Divider />
+        {statusOptions.map(status => {
+          return (
+            <Menu.Item
+              key={status}
+              icon={StatusIcon(theme, status)}
+              onClick={() => onUpdateTaskStatus(status)}
+            >
+              {statusLabel(status)}
+            </Menu.Item>
+          );
+        })}
+      </Menu.Dropdown>
+    </Menu>
+  );
+};
+
+type ManualStatusSelectorProps = {
+  task: ProjectTask;
+  tasks: ProjectTask[];
+  setTasks: (subtasks: ProjectTask[]) => void;
+};
+
+export const ManualStatusSelector = ({ task, tasks, setTasks }: ManualStatusSelectorProps) => {
+  const theme = useMantineTheme();
+
+  return (
+    <ManualStatusMenu task={task} tasks={tasks} setTasks={setTasks}>
+      <ActionIcon variant="transparent" radius={"sm"}>
+        {StatusIcon(theme, task.status)}
+      </ActionIcon>
+    </ManualStatusMenu>
   );
 };
 
