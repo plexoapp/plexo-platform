@@ -137,7 +137,7 @@ export const GenericLeadProjectMenu = ({
               return (
                 <Menu.Item
                   key={m.id}
-                  icon={MemberPhoto(m.photoUrl)}
+                  icon={MemberPhoto(m)}
                   onClick={() => {
                     onSelect && onSelect(m);
                     project && onUpdateProjectLead(m.id);
@@ -167,7 +167,7 @@ export const LeadProjectSelector = ({ lead, setLead }: LeadProjectSelectorProps)
           {MemberPhoto(undefined)}
         </Button>
       ) : (
-        <Button compact variant="light" color={"gray"} leftIcon={MemberPhoto(lead?.photoUrl)}>
+        <Button compact variant="light" color={"gray"} leftIcon={MemberPhoto(lead)}>
           <Text size={"xs"}>{LeadName(lead)}</Text>
         </Button>
       )}
@@ -182,12 +182,7 @@ type LeadSelectorByProjectProps = {
 export const LeadSelectorByProject = ({ project }: LeadSelectorByProjectProps) => {
   return (
     <GenericLeadProjectMenu project={project}>
-      <Button
-        compact
-        variant="light"
-        color={"gray"}
-        leftIcon={MemberPhoto(project?.lead?.photoUrl)}
-      >
+      <Button compact variant="light" color={"gray"} leftIcon={MemberPhoto(project?.lead)}>
         <Text size={"xs"}>{LeadName(project?.lead)}</Text>
       </Button>
     </GenericLeadProjectMenu>

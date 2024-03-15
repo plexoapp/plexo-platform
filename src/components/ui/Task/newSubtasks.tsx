@@ -31,7 +31,7 @@ const NewSubTasks = ({ subtasks, setSubtasks }: NewSubTasks) => {
   const [status, setStatus] = useState<TaskStatus>(TaskStatus.Backlog);
   const [lead, setLead] = useState<Member | null>(null);
 
-  const handleAddSubtask = (event: { preventDefault: () => void; }) => {
+  const handleAddSubtask = (event: { preventDefault: () => void }) => {
     event.preventDefault();
     setSubtasks([
       ...subtasks,
@@ -59,7 +59,7 @@ const NewSubTasks = ({ subtasks, setSubtasks }: NewSubTasks) => {
           </Tooltip>
           <Tooltip label={task.lead?.name ? task.lead?.name : "No assignee"} position="bottom">
             <Center w={28} h={28}>
-              {MemberPhoto(task.lead?.photoUrl)}
+              {MemberPhoto(task.lead)}
             </Center>
           </Tooltip>
 
@@ -116,7 +116,6 @@ const NewSubTasks = ({ subtasks, setSubtasks }: NewSubTasks) => {
             color={"brand"}
             leftIcon={<Plus size={16} />}
             type="submit"
-            
           >
             <Text size={"xs"}>Add subtask</Text>
           </Button>
