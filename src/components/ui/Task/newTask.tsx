@@ -193,7 +193,7 @@ const NewTask = ({ newTaskOpened, setNewTaskOpened, createMore, setCreateMore }:
               <Robot size="1rem" />
             </ActionIcon>
           </Tooltip>
-          <Text size={"sm"}>New Task</Text>
+          <Text size={"sm"}>{taskId ? "New Subtask" : "New Task"}</Text>
         </Group>
       }
       overlayProps={{
