@@ -2,7 +2,6 @@ import {
   Group,
   Modal,
   Text,
-  TextInput,
   Textarea,
   Button,
   Popover,
@@ -126,12 +125,14 @@ const NewProject = ({ newProjectOpened, setNewProjectOpened }: NewProjectProps) 
       }
     >
       <Stack spacing={10}>
-        <TextInput
-          data-autoFocus
+        <Textarea
+          autosize
+          data-autofocus
+          size="md"
+          minRows={1}
           placeholder="Project name"
           value={name}
           onChange={e => setName(e.target.value)}
-          size="md"
           classNames={{
             input: classes.input,
           }}

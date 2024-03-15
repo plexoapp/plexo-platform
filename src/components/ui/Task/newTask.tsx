@@ -1,7 +1,6 @@
 import {
   Modal,
   Group,
-  TextInput,
   Textarea,
   Button,
   Switch,
@@ -208,10 +207,12 @@ const NewTask = ({ newTaskOpened, setNewTaskOpened, createMore, setCreateMore }:
       shadow="md"
     >
       <Stack spacing={10}>
-        <TextInput
+        <Textarea
+          autosize
           data-autofocus
+          size="md"
+          minRows={1}
           placeholder="Task Title"
-          size="lg"
           value={title}
           onChange={e => setTitle(e.target.value)}
           classNames={{

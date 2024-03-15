@@ -1,4 +1,4 @@
-import { Button, Group, Skeleton, Stack, TextInput } from "@mantine/core";
+import { Button, Group, Skeleton, Stack, Textarea } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { useEffect } from "react";
 
@@ -57,8 +57,10 @@ export const TitleForm = ({ team, isLoading }: TitleFormProps) => {
   ) : (
     <form onSubmit={form.onSubmit(onUpdateTeam)}>
       <Stack mb={"xl"}>
-        <TextInput
+        <Textarea
+          autosize
           size="lg"
+          minRows={1}
           variant="filled"
           placeholder="Team Name"
           styles={theme => ({
