@@ -292,7 +292,7 @@ const TaskDetailPageContent = ({ task, isLoading }: TaskDetailProps) => {
   };
 
   return (
-    <Stack h={"100vh"}>
+    <Stack h={"100vh"} sx={{ flex: 1 }}>
       <Group
         h={73}
         px={20}

@@ -1,11 +1,11 @@
-import { AppShell, createStyles, Drawer } from "@mantine/core";
+import { AppShell, createStyles, Drawer, Group } from "@mantine/core";
 import { ReactNode, useEffect, useState } from "react";
 
 import { NavbarSearch } from "components/ui/NavBarWithSearch";
 import NewTask from "components/ui/Task/newTask";
 import { usePlexoContext } from "../../../context/PlexoContext";
 import { NavbarMinimal } from "../NavBarWithSearch/navbarMinimal";
-import { useDisclosure } from "@mantine/hooks";
+import Chat from "../Chat";
 
 interface LayoutProps {
   children: ReactNode;
@@ -28,6 +28,7 @@ const Layout = ({ children }: LayoutProps) => {
     setNewTaskOpened,
     createMoreTasks,
     setCreateMoreTasks,
+    chatOpened,
   } = usePlexoContext();
 
   const [collapseNavbar, setCollapseNavbar] = useState(false);
@@ -88,6 +89,7 @@ const Layout = ({ children }: LayoutProps) => {
             />
           )
         }
+        aside={chatOpened ? <Chat /> : undefined}
         styles={theme => ({
           main: {
             backgroundColor:
@@ -95,7 +97,7 @@ const Layout = ({ children }: LayoutProps) => {
           },
         })}
       >
-        {children}
+        <Group spacing={0}>{children}</Group>
       </AppShell>
     </>
   );

@@ -12,11 +12,20 @@ import {
   Tooltip,
   rem,
   ScrollArea,
+  Stack,
 } from "@mantine/core";
 
 import router from "next/router";
 import { useEffect, useState } from "react";
-import { Edit, Plus, Bulb, Checkbox, Search, ArrowBarToLeft } from "tabler-icons-react";
+import {
+  Edit,
+  Plus,
+  Bulb,
+  Checkbox,
+  Search,
+  ArrowBarToLeft,
+  MessageCircle2,
+} from "tabler-icons-react";
 
 import NewProject from "../Project/newProject";
 import NewTeam from "../Team/newTeam";
@@ -131,7 +140,8 @@ export function NavbarSearch({
   const [designProjectOpened, setDesignProjectOpened] = useState(false);
   const [newTeamOpened, setNewTeamOpened] = useState(false);
 
-  const { userData, isLoadingUser, plexoAPIEndpoint, authCookie } = usePlexoContext();
+  const { userData, isLoadingUser, plexoAPIEndpoint, authCookie, setChatOpened } =
+    usePlexoContext();
 
   const mainLinks = links.map(link => (
     <UnstyledButton
@@ -245,7 +255,7 @@ export function NavbarSearch({
           {section === "teams" ? <TeamsList /> : <ProjectsList />}
         </Navbar.Section>
         <Navbar.Section p="sm">
-          <Group>
+          <Stack>
             <Button
               variant="default"
               leftIcon={
@@ -258,9 +268,6 @@ export function NavbarSearch({
               }
               onClick={() => setDesignProjectOpened(true)}
               styles={{
-                root: {
-                  flex: 1,
-                },
                 label: {
                   color:
                     theme.colorScheme === "dark" ? theme.colors.brand[4] : theme.colors.brand[6],
@@ -269,12 +276,17 @@ export function NavbarSearch({
             >
               Design your project
             </Button>
-            {setCollapseNavbar ? (
-              <ActionIcon size="lg" onClick={() => setCollapseNavbar(true)}>
-                <ArrowBarToLeft size={18} />
+            <Group position="apart">
+              <ActionIcon variant="filled" color="brand" onClick={() => setChatOpened(true)}>
+                <MessageCircle2 size={18} />
               </ActionIcon>
-            ) : null}
-          </Group>
+              {setCollapseNavbar ? (
+                <ActionIcon size="lg" onClick={() => setCollapseNavbar(true)}>
+                  <ArrowBarToLeft size={18} />
+                </ActionIcon>
+              ) : null}
+            </Group>
+          </Stack>
         </Navbar.Section>
       </Navbar>
     </>

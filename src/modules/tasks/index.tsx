@@ -439,7 +439,7 @@ export const TasksPageContent = () => {
   });
 
   return (
-    <Stack>
+    <Stack sx={{ flex: 1 }}>
       <Group
         h={73}
         position="apart"

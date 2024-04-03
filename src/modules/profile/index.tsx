@@ -63,7 +63,7 @@ export const ProfilePageContent = () => {
         close={handlersProfileForm.close}
       />
       <PasswordForm opened={openedPasswordForm} close={handlersPasswordForm.close} />
-      <Stack spacing={"xl"}>
+      <Stack spacing={"xl"} sx={{ flex: 1 }}>
         <Group
           h={73}
           position="left"
