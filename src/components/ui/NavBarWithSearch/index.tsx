@@ -16,7 +16,7 @@ import {
 
 import router from "next/router";
 import { useEffect, useState } from "react";
-import { Edit, Plus, Bulb, Checkbox, Search } from "tabler-icons-react";
+import { Edit, Plus, Bulb, Checkbox, Search, ArrowBarToLeft } from "tabler-icons-react";
 
 import NewProject from "../Project/newProject";
 import NewTeam from "../Team/newTeam";
@@ -113,12 +113,18 @@ const links = [
 ];
 
 type NavBarWithSearchProps = {
-  onNewTask?: () => void;
   openedNav: boolean;
   setOpenedNav: (value: boolean) => void;
+  onNewTask?: () => void;
+  setCollapseNavbar?: (collapseNavbar: boolean) => void;
 };
 
-export function NavbarSearch({ onNewTask, openedNav, setOpenedNav }: NavBarWithSearchProps) {
+export function NavbarSearch({
+  onNewTask,
+  openedNav,
+  setOpenedNav,
+  setCollapseNavbar,
+}: NavBarWithSearchProps) {
   const { classes, theme } = useStyles();
   const [section, setSection] = useState<"projects" | "teams">("projects");
   const [newProjectOpened, setNewProjectOpened] = useState(false);
@@ -172,6 +178,7 @@ export function NavbarSearch({ onNewTask, openedNav, setOpenedNav }: NavBarWithS
             logoutURL={`${plexoAPIEndpoint}/auth/logout`}
             user={userData}
             isLoadingUser={isLoadingUser}
+            type="detail"
           />
         </Navbar.Section>
 
@@ -238,24 +245,36 @@ export function NavbarSearch({ onNewTask, openedNav, setOpenedNav }: NavBarWithS
           {section === "teams" ? <TeamsList /> : <ProjectsList />}
         </Navbar.Section>
         <Navbar.Section p="sm">
-          <Button
-            w={"100%"}
-            variant="default"
-            leftIcon={
-              <IconSparkles
-                size={16}
-                color={theme.colorScheme === "dark" ? theme.colors.brand[4] : theme.colors.brand[6]}
-              />
-            }
-            onClick={() => setDesignProjectOpened(true)}
-            styles={{
-              label: {
-                color: theme.colorScheme === "dark" ? theme.colors.brand[4] : theme.colors.brand[6],
-              },
-            }}
-          >
-            Design your project
-          </Button>
+          <Group>
+            <Button
+              variant="default"
+              leftIcon={
+                <IconSparkles
+                  size={16}
+                  color={
+                    theme.colorScheme === "dark" ? theme.colors.brand[4] : theme.colors.brand[6]
+                  }
+                />
+              }
+              onClick={() => setDesignProjectOpened(true)}
+              styles={{
+                root: {
+                  flex: 1,
+                },
+                label: {
+                  color:
+                    theme.colorScheme === "dark" ? theme.colors.brand[4] : theme.colors.brand[6],
+                },
+              }}
+            >
+              Design your project
+            </Button>
+            {setCollapseNavbar ? (
+              <ActionIcon size="lg" onClick={() => setCollapseNavbar(true)}>
+                <ArrowBarToLeft size={18} />
+              </ActionIcon>
+            ) : null}
+          </Group>
         </Navbar.Section>
       </Navbar>
     </>

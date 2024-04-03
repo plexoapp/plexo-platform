@@ -1,9 +1,11 @@
 import { AppShell, createStyles, Drawer } from "@mantine/core";
-import { ReactNode, useEffect } from "react";
+import { ReactNode, useEffect, useState } from "react";
 
 import { NavbarSearch } from "components/ui/NavBarWithSearch";
 import NewTask from "components/ui/Task/newTask";
 import { usePlexoContext } from "../../../context/PlexoContext";
+import { NavbarMinimal } from "../NavBarWithSearch/navbarMinimal";
+import { useDisclosure } from "@mantine/hooks";
 
 interface LayoutProps {
   children: ReactNode;
@@ -27,6 +29,8 @@ const Layout = ({ children }: LayoutProps) => {
     createMoreTasks,
     setCreateMoreTasks,
   } = usePlexoContext();
+
+  const [collapseNavbar, setCollapseNavbar] = useState(false);
 
   useEffect(() => {
     if (!newTaskOpened && createMoreTasks) {
@@ -70,14 +74,19 @@ const Layout = ({ children }: LayoutProps) => {
         padding={0}
         navbarOffsetBreakpoint="md"
         navbar={
-          <NavbarSearch
-            onNewTask={() => {
-              setNewTaskOpened(true);
-              setNavBarOpened(false);
-            }}
-            openedNav={false}
-            setOpenedNav={() => true}
-          />
+          collapseNavbar ? (
+            <NavbarMinimal setCollapseNavbar={setCollapseNavbar} openedNav={false} />
+          ) : (
+            <NavbarSearch
+              onNewTask={() => {
+                setNewTaskOpened(true);
+                setNavBarOpened(false);
+              }}
+              openedNav={false}
+              setOpenedNav={() => true}
+              setCollapseNavbar={setCollapseNavbar}
+            />
+          )
         }
         styles={theme => ({
           main: {
