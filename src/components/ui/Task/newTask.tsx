@@ -15,6 +15,7 @@ import {
 import { DatePicker } from "@mantine/dates";
 import { useToggle } from "@mantine/hooks";
 import { showNotification } from "@mantine/notifications";
+import EditorJS, { OutputData } from "@editorjs/editorjs";
 import { CalendarTime, Check, Robot, Subtask, X } from "tabler-icons-react";
 import { useState, useEffect } from "react";
 import { useQuery } from "urql";
@@ -31,6 +32,7 @@ import { priorityName, PrioritySelector } from "./priority";
 import { TaskStatus, TaskPriority, SuggestNewTaskDocument } from "integration/graphql";
 import NewSubTasks from "./newSubtasks";
 import { usePlexoContext } from "context/PlexoContext";
+import dynamic from "next/dynamic";
 
 type NewTaskProps = {
   newTaskOpened: boolean;
@@ -70,6 +72,9 @@ const NewTask = ({ newTaskOpened, setNewTaskOpened, createMore, setCreateMore }:
   const [showSubtasks, toggleSubtasks] = useToggle([false, true]);
   const { createTask, fetchCreateTask } = useActions();
   const { taskId, setTaskId } = usePlexoContext();
+  //Editor states
+  const [data, setData] = useState<OutputData | undefined>(undefined);
+  const [editorInstance, setEditorInstance] = useState<EditorJS | null>(null);
 
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
@@ -172,6 +177,18 @@ const NewTask = ({ newTaskOpened, setNewTaskOpened, createMore, setCreateMore }:
     setTaskId(undefined);
   };
 
+  // Get editor data
+  /* editorInstance
+    ?.save()
+    .then(outputData => {
+      console.log("Article data: ", outputData);
+    })
+    .catch(error => {
+      console.log("Saving failed: ", error);
+    }); */
+
+  const EditorWidget = dynamic(import("../Editor/index"), { ssr: false });
+
   return (
     <Modal
       closeOnEscape
@@ -229,6 +246,13 @@ const NewTask = ({ newTaskOpened, setNewTaskOpened, createMore, setCreateMore }:
           classNames={{
             input: classes.input,
           }}
+        />
+
+        <EditorWidget
+          data={data}
+          onChange={setData}
+          setEditorInstance={setEditorInstance}
+          editorblock="editorjs-container"
         />
         <Group spacing={6} mb={"md"}>
           <StatusSelector status={status} setStatus={setStatus} type="button" />
