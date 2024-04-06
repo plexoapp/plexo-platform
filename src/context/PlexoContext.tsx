@@ -42,6 +42,12 @@ type PlexoContextProps = {
   isLoadingLabels: boolean;
   chatOpened: boolean;
   setChatOpened: (chatOpened: boolean) => void;
+  designProjectOpened: boolean;
+  setDesignProjectOpened: (designProjectOpened: boolean) => void;
+  newProjectOpened: boolean;
+  setNewProjectOpened: (newProjectOpened: boolean) => void;
+  newTeamOpened: boolean;
+  setNewTeamOpened: (newTeamOpened: boolean) => void;
 };
 
 export const PlexoContext = createContext<PlexoContextProps | null>(null);
@@ -66,6 +72,9 @@ const PlexoProvider = ({
   const [newTaskOpened, setNewTaskOpened] = useState(false);
   const [createMoreTasks, setCreateMoreTasks] = useState(false);
   const [chatOpened, setChatOpened] = useState(false);
+  const [designProjectOpened, setDesignProjectOpened] = useState(false);
+  const [newProjectOpened, setNewProjectOpened] = useState(false);
+  const [newTeamOpened, setNewTeamOpened] = useState(false);
 
   const [authCookie, setAuthCookie] = useState(initialAuthCookie);
 
@@ -160,6 +169,12 @@ const PlexoProvider = ({
         isLoadingLabels,
         chatOpened,
         setChatOpened,
+        designProjectOpened,
+        setDesignProjectOpened,
+        newProjectOpened,
+        setNewProjectOpened,
+        newTeamOpened,
+        setNewTeamOpened,
       }}
     >
       {children}

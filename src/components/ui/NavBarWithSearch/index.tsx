@@ -12,32 +12,20 @@ import {
   Tooltip,
   rem,
   ScrollArea,
-  Stack,
 } from "@mantine/core";
 
 import router from "next/router";
 import { useEffect, useState } from "react";
-import {
-  Edit,
-  Plus,
-  Bulb,
-  Checkbox,
-  Search,
-  ArrowBarToLeft,
-  MessageCircle2,
-} from "tabler-icons-react";
+import { Edit, Plus, Bulb, Checkbox, Search, ArrowBarToLeft } from "tabler-icons-react";
 
-import NewProject from "../Project/newProject";
-import NewTeam from "../Team/newTeam";
 import { UserButton } from "../UserButton";
-import ProjectsList from "./projects";
-import TeamsList from "./teams";
+import { ProjectsList } from "./projects";
+import { TeamsList } from "./teams";
 import { spotlight } from "@mantine/spotlight";
 import { ProjectIcon } from "../Task/project";
 import { TeamIcon } from "../Project/team";
 import { usePlexoContext } from "context/PlexoContext";
 import { IconSparkles } from "@tabler/icons-react";
-import DesignProject from "../Project/DesignProject/designProject";
 
 const useStyles = createStyles(theme => ({
   navbar: {
@@ -123,25 +111,24 @@ const links = [
 
 type NavBarWithSearchProps = {
   openedNav: boolean;
-  setOpenedNav: (value: boolean) => void;
   onNewTask?: () => void;
   setCollapseNavbar?: (collapseNavbar: boolean) => void;
 };
 
-export function NavbarSearch({
-  onNewTask,
-  openedNav,
-  setOpenedNav,
-  setCollapseNavbar,
-}: NavBarWithSearchProps) {
+export function NavbarSearch({ onNewTask, openedNav, setCollapseNavbar }: NavBarWithSearchProps) {
   const { classes, theme } = useStyles();
   const [section, setSection] = useState<"projects" | "teams">("projects");
-  const [newProjectOpened, setNewProjectOpened] = useState(false);
-  const [designProjectOpened, setDesignProjectOpened] = useState(false);
-  const [newTeamOpened, setNewTeamOpened] = useState(false);
 
-  const { userData, isLoadingUser, plexoAPIEndpoint, authCookie, setChatOpened } =
-    usePlexoContext();
+  const {
+    userData,
+    isLoadingUser,
+    plexoAPIEndpoint,
+    authCookie,
+    setChatOpened,
+    setDesignProjectOpened,
+    setNewProjectOpened,
+    setNewTeamOpened,
+  } = usePlexoContext();
 
   const mainLinks = links.map(link => (
     <UnstyledButton
@@ -170,125 +157,115 @@ export function NavbarSearch({
   }, []);
 
   return (
-    <>
-      <NewProject newProjectOpened={newProjectOpened} setNewProjectOpened={setNewProjectOpened} />
-      <DesignProject
-        designProjectOpened={designProjectOpened}
-        setDesignProjectOpened={setDesignProjectOpened}
-      />
-      <NewTeam newTeamOpened={newTeamOpened} setNewTeamOpened={setNewTeamOpened} />
-      <Navbar
-        width={{ sm: 300 }}
-        hiddenBreakpoint="md"
-        hidden={!openedNav}
-        className={classes.navbar}
-      >
-        <Navbar.Section className={classes.section}>
-          <UserButton
-            logoutURL={`${plexoAPIEndpoint}/auth/logout`}
-            user={userData}
-            isLoadingUser={isLoadingUser}
-            type="detail"
-          />
-        </Navbar.Section>
+    <Navbar
+      width={{ sm: 300 }}
+      hiddenBreakpoint="md"
+      hidden={!openedNav}
+      className={classes.navbar}
+    >
+      <Navbar.Section className={classes.section}>
+        <UserButton
+          logoutURL={`${plexoAPIEndpoint}/auth/logout`}
+          user={userData}
+          isLoadingUser={isLoadingUser}
+          type="button"
+          menuPosition="bottom-end"
+        />
+      </Navbar.Section>
 
-        <Navbar.Section className={classes.section} p="sm">
-          <Group mb={"md"}>
-            <Button
-              leftIcon={<Edit strokeWidth={1.5} />}
-              size="sm"
-              onClick={onNewTask}
-              sx={{ flexGrow: 1 }}
+      <Navbar.Section className={classes.section} p="sm">
+        <Group mb={"md"}>
+          <Button
+            leftIcon={<Edit strokeWidth={1.5} />}
+            size="sm"
+            onClick={onNewTask}
+            sx={{ flexGrow: 1 }}
+          >
+            New Task
+          </Button>
+          <ActionIcon variant="default" size="lg" onClick={() => spotlight.open()}>
+            <Search size={18} strokeWidth={1.5} />
+          </ActionIcon>
+        </Group>
+        <div>{mainLinks}</div>
+      </Navbar.Section>
+
+      <Navbar.Section p="sm">
+        <Group position="apart">
+          <SegmentedControl
+            size={"xs"}
+            value={section}
+            onChange={value => setSection(value as "projects" | "teams")}
+            transitionTimingFunction="ease"
+            data={[
+              {
+                label: (
+                  <Center>
+                    <ProjectIcon />
+                    <Text ml={6} size={"xs"}>
+                      Projects
+                    </Text>
+                  </Center>
+                ),
+                value: "projects",
+              },
+              {
+                label: (
+                  <Center>
+                    <TeamIcon />
+                    <Text ml={6} size={"xs"}>
+                      Teams
+                    </Text>
+                  </Center>
+                ),
+                value: "teams",
+              },
+            ]}
+          />
+          <Tooltip label={section === "teams" ? "New team" : "New project"} position="top">
+            <ActionIcon
+              onClick={() =>
+                section === "teams" ? setNewTeamOpened(true) : setNewProjectOpened(true)
+              }
             >
-              New Task
-            </Button>
-            <ActionIcon variant="default" size="lg" onClick={() => spotlight.open()}>
-              <Search size={18} strokeWidth={1.5} />
+              <Plus size={18} />
             </ActionIcon>
-          </Group>
-          <div>{mainLinks}</div>
-        </Navbar.Section>
-        <Navbar.Section p="sm">
-          <Group position="apart">
-            <SegmentedControl
-              size={"xs"}
-              value={section}
-              onChange={value => setSection(value as "projects" | "teams")}
-              transitionTimingFunction="ease"
-              data={[
-                {
-                  label: (
-                    <Center>
-                      <ProjectIcon />
-                      <Text ml={6} size={"xs"}>
-                        Projects
-                      </Text>
-                    </Center>
-                  ),
-                  value: "projects",
-                },
-                {
-                  label: (
-                    <Center>
-                      <TeamIcon />
-                      <Text ml={6} size={"xs"}>
-                        Teams
-                      </Text>
-                    </Center>
-                  ),
-                  value: "teams",
-                },
-              ]}
-            />
-            <Tooltip label={section === "teams" ? "New team" : "New project"} position="top">
-              <ActionIcon
-                onClick={() =>
-                  section === "teams" ? setNewTeamOpened(true) : setNewProjectOpened(true)
-                }
-              >
-                <Plus size={18} />
+          </Tooltip>
+        </Group>
+      </Navbar.Section>
+      <Navbar.Section className={classes.section} grow component={ScrollArea} p="xs" pt={0}>
+        {section === "teams" ? <TeamsList /> : <ProjectsList />}
+      </Navbar.Section>
+      <Navbar.Section p="sm">
+        <Group>
+          <Button
+            variant="default"
+            leftIcon={
+              <IconSparkles
+                size={16}
+                color={theme.colorScheme === "dark" ? theme.colors.brand[4] : theme.colors.brand[6]}
+              />
+            }
+            onClick={() => setDesignProjectOpened(true)}
+            styles={{
+              label: {
+                color: theme.colorScheme === "dark" ? theme.colors.brand[4] : theme.colors.brand[6],
+              },
+            }}
+            sx={{ flexGrow: 1 }}
+          >
+            Design your project
+          </Button>
+
+          {setCollapseNavbar ? (
+            <Tooltip label="Hide">
+              <ActionIcon size="lg" onClick={() => setCollapseNavbar(true)}>
+                <ArrowBarToLeft size={18} />
               </ActionIcon>
             </Tooltip>
-          </Group>
-        </Navbar.Section>
-        <Navbar.Section className={classes.section} grow component={ScrollArea} p="xs" pt={0}>
-          {section === "teams" ? <TeamsList /> : <ProjectsList />}
-        </Navbar.Section>
-        <Navbar.Section p="sm">
-          <Stack>
-            <Button
-              variant="default"
-              leftIcon={
-                <IconSparkles
-                  size={16}
-                  color={
-                    theme.colorScheme === "dark" ? theme.colors.brand[4] : theme.colors.brand[6]
-                  }
-                />
-              }
-              onClick={() => setDesignProjectOpened(true)}
-              styles={{
-                label: {
-                  color:
-                    theme.colorScheme === "dark" ? theme.colors.brand[4] : theme.colors.brand[6],
-                },
-              }}
-            >
-              Design your project
-            </Button>
-            <Group position="apart">
-              <ActionIcon variant="filled" color="brand" onClick={() => setChatOpened(true)}>
-                <MessageCircle2 size={18} />
-              </ActionIcon>
-              {setCollapseNavbar ? (
-                <ActionIcon size="lg" onClick={() => setCollapseNavbar(true)}>
-                  <ArrowBarToLeft size={18} />
-                </ActionIcon>
-              ) : null}
-            </Group>
-          </Stack>
-        </Navbar.Section>
-      </Navbar>
-    </>
+          ) : null}
+        </Group>
+      </Navbar.Section>
+    </Navbar>
   );
 }

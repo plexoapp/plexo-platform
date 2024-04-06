@@ -9,6 +9,8 @@ import {
   Text,
   useMantineTheme,
   useMantineColorScheme,
+  Aside,
+  ScrollArea,
 } from "@mantine/core";
 import PlexoUserImage from "components/resources/PlexoUserImage";
 import { usePlexoContext } from "context/PlexoContext";
@@ -33,7 +35,11 @@ const messages = [
   },
 ];
 
-const Chat = () => {
+type ChatProps = {
+  chatOpened: boolean;
+};
+
+const Chat = ({ chatOpened }: ChatProps) => {
   const theme = useMantineTheme();
   const { colorScheme } = useMantineColorScheme();
   const { projectsData, isLoadingProjects, setChatOpened } = usePlexoContext();
@@ -56,53 +62,48 @@ const Chat = () => {
     theme.colorScheme === "dark" ? theme.colors.dark[5] : theme.colors.gray[1];
 
   return (
-    <Stack
-      w={350}
-      spacing={0}
-      sx={{
-        borderLeft: `${rem(1)} solid ${
-          theme.colorScheme === "dark" ? theme.colors.dark[4] : theme.colors.gray[3]
-        }`,
-      }}
-    >
-      <Group
-        h={73}
-        sx={{
-          padding: theme.spacing.sm,
-          borderBottom: `${rem(1)} solid ${
-            theme.colorScheme === "dark" ? theme.colors.dark[4] : theme.colors.gray[3]
-          }`,
-        }}
-      >
-        <Group position="apart" w={"100%"}>
-          <Group /* sx={{ flex: 1 }} */>
-            <PlexoUserImage
-              scale={0.12}
-              backgroundColor={colorScheme === "light" ? theme.colors.gray[1] : undefined}
-            />
-            <Stack spacing={4}>
-              <Text size={"sm"}>Plexo</Text>
-              {/*  <Group spacing={"xs"}>
+    <Aside width={{ sm: 300 }} hiddenBreakpoint="md" hidden={!chatOpened}>
+      <Aside.Section>
+        <Group
+          p={"sm"}
+          h={73}
+          sx={{
+            borderBottom: `${rem(1)} solid ${
+              theme.colorScheme === "dark" ? theme.colors.dark[4] : theme.colors.gray[3]
+            }`,
+          }}
+        >
+          <Group position="apart" w={"100%"}>
+            <Group /* sx={{ flex: 1 }} */>
+              <PlexoUserImage
+                scale={0.12}
+                backgroundColor={colorScheme === "light" ? theme.colors.gray[1] : undefined}
+              />
+              <Stack spacing={4}>
+                <Text size={"sm"}>Plexo</Text>
+                {/*  <Group spacing={"xs"}>
                 <ColorSwatch color={theme.colors.green[4]} size={6} />
                 <Text size={"xs"}>Active</Text>
               </Group> */}
-            </Stack>
-          </Group>
-          {/* <Select
+              </Stack>
+            </Group>
+            {/* <Select
             variant="filled"
             size="xs"
             disabled={isLoadingProjects}
             placeholder="Select a project"
             data={projects}
           /> */}
-          <CloseButton
-            aria-label="Close chat"
-            onClick={() => setChatOpened(false)}
-            color={theme.primaryColor}
-          />
+            <CloseButton
+              aria-label="Close chat"
+              onClick={() => setChatOpened(false)}
+              color={theme.primaryColor}
+            />
+          </Group>
         </Group>
-      </Group>
-      <Stack p={"md"} justify="flex-end" sx={{ flex: 1 }}>
+      </Aside.Section>
+
+      <Aside.Section grow component={ScrollArea} p={"sm"}>
         <Stack>
           {messages.map(item => {
             return (
@@ -125,6 +126,9 @@ const Chat = () => {
             );
           })}
         </Stack>
+      </Aside.Section>
+
+      <Aside.Section p={"sm"}>
         <TextInput
           autoFocus
           variant="default"
@@ -143,8 +147,8 @@ const Chat = () => {
             },
           }} */
         />
-      </Stack>
-    </Stack>
+      </Aside.Section>
+    </Aside>
   );
 };
 

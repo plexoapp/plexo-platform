@@ -1,17 +1,33 @@
-import { Center, Tooltip, UnstyledButton, Stack, rem, createStyles, Navbar } from "@mantine/core";
 import {
-  IconHome2,
-  IconGauge,
-  IconDeviceDesktopAnalytics,
-  IconFingerprint,
-  IconCalendarStats,
-  IconUser,
-  IconSettings,
-  IconLogout,
-  IconSwitchHorizontal,
-} from "@tabler/icons-react";
+  Center,
+  Tooltip,
+  UnstyledButton,
+  Stack,
+  rem,
+  createStyles,
+  Navbar,
+  Menu,
+  ScrollArea,
+} from "@mantine/core";
+
 import { usePlexoContext } from "context/PlexoContext";
 import { UserButton } from "../UserButton";
+import {
+  Affiliate,
+  ArrowBarRight,
+  Edit,
+  Icon,
+  LayoutGrid,
+  MessageCircle2,
+  Search,
+  Checkbox,
+  Plus,
+} from "tabler-icons-react";
+import { IconSparkles } from "@tabler/icons-react";
+import { spotlight } from "@mantine/spotlight";
+import router from "next/router";
+import { ProjectMenuList } from "./projects";
+import { TeamsMenuList } from "./teams";
 
 const useStyles = createStyles(theme => ({
   navbar: {
@@ -46,31 +62,22 @@ const useStyles = createStyles(theme => ({
 }));
 
 interface NavbarLinkProps {
-  icon: typeof IconHome2;
+  icon: Icon;
   label: string;
   onClick?(): void;
+  color?: string | undefined;
 }
 
-function NavbarLink({ icon: Icon, label, onClick }: NavbarLinkProps) {
+function NavbarLink({ icon: Icon, label, onClick, color }: NavbarLinkProps) {
   const { classes } = useStyles();
   return (
-    <Tooltip label={label} position="right" transitionProps={{ duration: 0 }}>
+    <Tooltip label={label} position="right" /* transitionProps={{ duration: 0 }} */>
       <UnstyledButton onClick={onClick} className={classes.link}>
-        <Icon style={{ width: rem(20), height: rem(20) }} stroke={1.5} />
+        <Icon style={{ width: rem(20), height: rem(20) }} strokeWidth={1.5} color={color} />
       </UnstyledButton>
     </Tooltip>
   );
 }
-
-const mockdata = [
-  { icon: IconHome2, label: "Home" },
-  { icon: IconGauge, label: "Dashboard" },
-  { icon: IconDeviceDesktopAnalytics, label: "Analytics" },
-  { icon: IconCalendarStats, label: "Releases" },
-  { icon: IconUser, label: "Account" },
-  { icon: IconFingerprint, label: "Security" },
-  { icon: IconSettings, label: "Settings" },
-];
 
 export function NavbarMinimal({
   setCollapseNavbar,
@@ -79,44 +86,99 @@ export function NavbarMinimal({
   setCollapseNavbar: (collapseNavbar: boolean) => void;
   openedNav: boolean;
 }) {
-  const { classes } = useStyles();
+  const { classes, theme } = useStyles();
 
-  const { userData, isLoadingUser, plexoAPIEndpoint } = usePlexoContext();
-
-  const links = mockdata.map((link, index) => (
-    <NavbarLink {...link} key={link.label} /* onClick={() => setActive(index)} */ />
-  ));
+  const {
+    userData,
+    isLoadingUser,
+    plexoAPIEndpoint,
+    setChatOpened,
+    setNewTaskOpened,
+    setNavBarOpened,
+    setDesignProjectOpened,
+    setNewProjectOpened,
+    setNewTeamOpened,
+  } = usePlexoContext();
 
   return (
-    <Navbar
-      width={{ sm: 80 }}
-      hiddenBreakpoint="md"
-      hidden={!openedNav}
-      /* className={classes.navbar} */
-      className={classes.navbar}
-    >
+    <Navbar width={{ sm: 80 }} hiddenBreakpoint="md" hidden={!openedNav} className={classes.navbar}>
       <Center>
         <UserButton
           logoutURL={`${plexoAPIEndpoint}/auth/logout`}
           user={userData}
           isLoadingUser={isLoadingUser}
-          type="simple"
+          type="icon"
+          menuPosition="right-start"
         />
       </Center>
 
       <div className={classes.navbarMain}>
         <Stack justify="center" spacing={0}>
-          {links}
+          <NavbarLink
+            icon={Edit}
+            label="New task"
+            color={theme.colorScheme === "dark" ? theme.colors.brand[4] : theme.colors.brand[6]}
+            onClick={() => {
+              setNewTaskOpened(true);
+              setNavBarOpened(false);
+            }}
+          />
+          <NavbarLink icon={Search} label="Search" onClick={() => spotlight.open()} />
+          <NavbarLink icon={Checkbox} label="Tasks" onClick={() => router.push("/tasks")} />
+
+          <Menu position="right-start">
+            <Menu.Target>
+              <Tooltip label="Projects" position="right">
+                <UnstyledButton className={classes.link}>
+                  <LayoutGrid style={{ width: rem(20), height: rem(20) }} strokeWidth={1.5} />
+                </UnstyledButton>
+              </Tooltip>
+            </Menu.Target>
+
+            <Menu.Dropdown>
+              <Menu.Item onClick={() => setNewProjectOpened(true)} icon={<Plus size={16} />}>
+                New Project
+              </Menu.Item>
+
+              <ScrollArea.Autosize mah={250}>
+                <Menu.Label>Projects</Menu.Label>
+                <ProjectMenuList />
+              </ScrollArea.Autosize>
+            </Menu.Dropdown>
+          </Menu>
+
+          <Menu position="right-start">
+            <Menu.Target>
+              <Tooltip label="Teams" position="right">
+                <UnstyledButton className={classes.link}>
+                  <Affiliate style={{ width: rem(20), height: rem(20) }} strokeWidth={1.5} />
+                </UnstyledButton>
+              </Tooltip>
+            </Menu.Target>
+
+            <Menu.Dropdown>
+              <Menu.Item onClick={() => setNewTeamOpened(true)} icon={<Plus size={16} />}>
+                New Team
+              </Menu.Item>
+              s
+              <ScrollArea.Autosize mah={250}>
+                <Menu.Label>Teams</Menu.Label>
+                <TeamsMenuList />
+              </ScrollArea.Autosize>
+            </Menu.Dropdown>
+          </Menu>
         </Stack>
       </div>
 
       <Stack justify="center" spacing={0}>
         <NavbarLink
-          icon={IconSwitchHorizontal}
-          label="Expand"
-          onClick={() => setCollapseNavbar(false)}
+          icon={IconSparkles}
+          label="Design your Project"
+          color={theme.colorScheme === "dark" ? theme.colors.brand[4] : theme.colors.brand[6]}
+          onClick={() => setDesignProjectOpened(true)}
         />
-        <NavbarLink icon={IconLogout} label="Logout" />
+
+        <NavbarLink icon={ArrowBarRight} label="Expand" onClick={() => setCollapseNavbar(false)} />
       </Stack>
     </Navbar>
   );

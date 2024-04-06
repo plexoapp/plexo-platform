@@ -16,6 +16,7 @@ import { useRouter } from "next/router";
 import { ErrorNotification } from "lib/notifications";
 import { usePlexoContext } from "context/PlexoContext";
 import { UserPhoto } from "modules/profile";
+import { FloatingPosition } from "@mantine/core/lib/Floating";
 
 const useStyles = createStyles(theme => ({
   user: {
@@ -34,10 +35,17 @@ interface UserButtonProps extends UnstyledButtonProps {
   logoutURL: string;
   isLoadingUser: boolean;
   user: User | undefined;
-  type: "simple" | "detail";
+  type: "icon" | "button";
+  menuPosition: FloatingPosition;
 }
 
-export function UserButton({ logoutURL, user, isLoadingUser, type }: UserButtonProps) {
+export function UserButton({
+  logoutURL,
+  user,
+  isLoadingUser,
+  type,
+  menuPosition,
+}: UserButtonProps) {
   const { classes } = useStyles();
   const plexo = usePlexoContext();
 
@@ -71,13 +79,13 @@ export function UserButton({ logoutURL, user, isLoadingUser, type }: UserButtonP
 
   return (
     <Group position="center">
-      <Menu position={"bottom-end"} offset={0}>
+      <Menu position={menuPosition} offset={0}>
         <Menu.Target>
           <UnstyledButton className={classes.user}>
             {isLoadingUser ? (
               <Group>
                 <Skeleton height={38} circle />
-                {type == "detail" ? (
+                {type == "button" ? (
                   <Stack spacing={0} sx={{ flex: 1 }}>
                     <Skeleton height={10} mt={6} width="100%" radius="xs" />
                     <Skeleton height={8} mt={6} width="100%" radius="xs" />
@@ -87,7 +95,7 @@ export function UserButton({ logoutURL, user, isLoadingUser, type }: UserButtonP
             ) : (
               <Group>
                 <UserPhoto user={user} size="md" />
-                {type == "detail" ? (
+                {type == "button" ? (
                   <Stack spacing={0}>
                     <Text size="sm" weight={500}>
                       {user?.name}

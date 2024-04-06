@@ -10,14 +10,12 @@ import {
   ScrollArea,
   Stack,
   createStyles,
-  MediaQuery,
-  ActionIcon,
   useMantineTheme,
 } from "@mantine/core";
 import { useListState } from "@mantine/hooks";
 import { useEffect, useState } from "react";
 import { DragDropContext, Draggable, Droppable } from "react-beautiful-dnd";
-import { LayoutColumns, LayoutRows, LayoutSidebar } from "tabler-icons-react";
+import { LayoutColumns, LayoutRows } from "tabler-icons-react";
 import { getCookie, setCookie } from "cookies-next";
 import { useQuery } from "urql";
 
@@ -207,10 +205,14 @@ const TasksBoard = ({ taskData, fetching }: TasksProps) => {
   };
 
   return (
-    <ScrollArea type="hover" offsetScrollbars style={{ height: "calc(100vh - 90px)" }}>
-      <SimpleGrid cols={StatusBoardCols()} spacing={325}>
+    <ScrollArea
+      type="hover"
+      offsetScrollbars
+      style={{ height: "calc(100vh - 130px)", flexGrow: 1 }}
+    >
+      <SimpleGrid cols={StatusBoardCols()} spacing={330} p={"md"}>
         {StatusBoardEnable(TaskStatus.None) && (
-          <Stack spacing={0} sx={{ minWidth: 312, marginLeft: 20 }}>
+          <Stack spacing={0} sx={{ minWidth: 312 }}>
             <Counter status={TaskStatus.None} fetching={fetching} />
             <ScrollArea style={{ height: 812 }} offsetScrollbars>
               {fetching ? (
@@ -222,7 +224,7 @@ const TasksBoard = ({ taskData, fetching }: TasksProps) => {
           </Stack>
         )}
         {StatusBoardEnable(TaskStatus.Backlog) && (
-          <Stack spacing={0} sx={{ minWidth: 312, marginLeft: 20 }}>
+          <Stack spacing={0} sx={{ minWidth: 312 }}>
             <Counter status={TaskStatus.Backlog} fetching={fetching} />
             <ScrollArea style={{ height: 812 }} offsetScrollbars>
               {fetching ? (
@@ -234,7 +236,7 @@ const TasksBoard = ({ taskData, fetching }: TasksProps) => {
           </Stack>
         )}
         {StatusBoardEnable(TaskStatus.ToDo) && (
-          <Stack spacing={0} sx={{ minWidth: 312, marginLeft: 20 }}>
+          <Stack spacing={0} sx={{ minWidth: 312 }}>
             <Counter status={TaskStatus.ToDo} fetching={fetching} />
             <ScrollArea style={{ height: 812 }} offsetScrollbars>
               {fetching ? (
@@ -246,7 +248,7 @@ const TasksBoard = ({ taskData, fetching }: TasksProps) => {
           </Stack>
         )}
         {StatusBoardEnable(TaskStatus.InProgress) && (
-          <Stack spacing={0} sx={{ minWidth: 312, marginLeft: 20 }}>
+          <Stack spacing={0} sx={{ minWidth: 312 }}>
             <Counter status={TaskStatus.InProgress} fetching={fetching} />
             <ScrollArea style={{ height: 812 }} offsetScrollbars>
               {fetching ? (
@@ -258,7 +260,7 @@ const TasksBoard = ({ taskData, fetching }: TasksProps) => {
           </Stack>
         )}
         {StatusBoardEnable(TaskStatus.Done) && (
-          <Stack spacing={0} sx={{ minWidth: 312, marginLeft: 20 }}>
+          <Stack spacing={0} sx={{ minWidth: 312 }}>
             <Counter status={TaskStatus.Done} fetching={fetching} />
             <ScrollArea style={{ height: 812 }} offsetScrollbars>
               {fetching ? (
@@ -270,7 +272,7 @@ const TasksBoard = ({ taskData, fetching }: TasksProps) => {
           </Stack>
         )}
         {StatusBoardEnable(TaskStatus.Canceled) && (
-          <Stack spacing={0} sx={{ minWidth: 312, marginLeft: 20 }}>
+          <Stack spacing={0} sx={{ minWidth: 312 }}>
             <Counter status={TaskStatus.Canceled} fetching={fetching} />
             <ScrollArea style={{ height: 812 }} offsetScrollbars>
               {fetching ? (
@@ -309,8 +311,8 @@ const TasksList = ({ taskData, fetching }: TasksProps) => {
   };
 
   return (
-    <ScrollArea type="hover" offsetScrollbars style={{ height: "calc(100vh - 90px)" }}>
-      <Container>
+    <ScrollArea type="hover" offsetScrollbars h={"calc(100vh - 130px)"} style={{ flexGrow: 1 }}>
+      <Container p={"md"}>
         <Counter status={TaskStatus.None} fetching={fetching} />
         {fetching ? <Skeleton height={36} radius="sm" /> : <TaskList status={TaskStatus.None} />}
 
@@ -439,45 +441,25 @@ export const TasksPageContent = () => {
   });
 
   return (
-    <Stack sx={{ flex: 1 }}>
-      <Group
-        h={73}
-        position="apart"
-        sx={{
-          padding: theme.spacing.md,
-          backgroundColor:
-            theme.colorScheme === "dark" ? theme.colors.dark[8] : theme.colors.gray[0],
-          "&:not(:last-of-type)": {
-            borderBottom: `1px solid ${
-              theme.colorScheme === "dark" ? theme.colors.dark[4] : theme.colors.gray[3]
-            }`,
-          },
-        }}
-      >
-        <Group>
-          <MediaQuery largerThan="md" styles={{ display: "none" }}>
-            <ActionIcon onClick={() => setNavBarOpened(true)}>
-              <LayoutSidebar size={16} />
-            </ActionIcon>
-          </MediaQuery>
-          <FilterMenu
-            statusFilters={statusFilters}
-            setStatusFilters={setStatusFilters}
-            assigneeFilters={assigneeFilters}
-            setAssigneeFilters={setAssigneeFilters}
-            leaderFilters={leaderFilters}
-            setLeaderFilters={setLeaderFilters}
-            creatorFilters={creatorFilters}
-            setCreatorFilters={setCreatorFilters}
-            priorityFilters={priorityFilters}
-            setPriorityFilters={setPriorityFilters}
-            labelsFilters={labelsFilters}
-            setLabelsFilters={setLabelsFilters}
-            projectFilters={projectFilters}
-            setProjectFilters={setProjectFilters}
-            total={total}
-          />
-        </Group>
+    <Stack h={"100%"} sx={{ flexGrow: 1 }} spacing={0}>
+      <Group py={"sm"} px={"md"} position="apart">
+        <FilterMenu
+          statusFilters={statusFilters}
+          setStatusFilters={setStatusFilters}
+          assigneeFilters={assigneeFilters}
+          setAssigneeFilters={setAssigneeFilters}
+          leaderFilters={leaderFilters}
+          setLeaderFilters={setLeaderFilters}
+          creatorFilters={creatorFilters}
+          setCreatorFilters={setCreatorFilters}
+          priorityFilters={priorityFilters}
+          setPriorityFilters={setPriorityFilters}
+          labelsFilters={labelsFilters}
+          setLabelsFilters={setLabelsFilters}
+          projectFilters={projectFilters}
+          setProjectFilters={setProjectFilters}
+          total={total}
+        />
 
         <Group>
           <SegmentedControl
