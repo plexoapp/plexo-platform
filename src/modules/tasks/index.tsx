@@ -444,17 +444,13 @@ export const TasksPageContent = () => {
         h={73}
         position="apart"
         sx={{
-          padding: theme.spacing.md,
+          paddingBottom: theme.spacing.md,
+          paddingLeft: theme.spacing.md,
           backgroundColor:
             theme.colorScheme === "dark" ? theme.colors.dark[8] : theme.colors.gray[0],
-          "&:not(:last-of-type)": {
-            borderBottom: `1px solid ${
-              theme.colorScheme === "dark" ? theme.colors.dark[4] : theme.colors.gray[3]
-            }`,
-          },
         }}
       >
-        <Group>
+        <Group pl="md">
           <MediaQuery largerThan="md" styles={{ display: "none" }}>
             <ActionIcon onClick={() => setNavBarOpened(true)}>
               <LayoutSidebar size={16} />
@@ -479,7 +475,7 @@ export const TasksPageContent = () => {
           />
         </Group>
 
-        <Group>
+        <Group pr="md">
           <SegmentedControl
             className={classes["segmented-control"]}
             size={"xs"}

@@ -1,12 +1,14 @@
-import { AppShell, createStyles, Drawer } from "@mantine/core";
+import { AppShell, createStyles, Drawer, Group, Text, ActionIcon } from "@mantine/core";
 import { ReactNode, useEffect } from "react";
 
 import { NavbarSearch } from "components/ui/NavBarWithSearch";
 import NewTask from "components/ui/Task/newTask";
 import { usePlexoContext } from "../../../context/PlexoContext";
+import { IconMessageCircle } from "@tabler/icons-react";
 
 interface LayoutProps {
   children: ReactNode;
+  title?: String;
 }
 
 const useStyles = createStyles(theme => ({
@@ -17,8 +19,8 @@ const useStyles = createStyles(theme => ({
   },
 }));
 
-const Layout = ({ children }: LayoutProps) => {
-  const { classes } = useStyles();
+const Layout = ({ children, title }: LayoutProps) => {
+  const { classes, theme } = useStyles();
   const {
     navBarOpened,
     setNavBarOpened,
@@ -86,6 +88,30 @@ const Layout = ({ children }: LayoutProps) => {
           },
         })}
       >
+        <Group
+          h={73}
+          position="apart"
+          sx={{
+            padding: theme.spacing.md,
+            backgroundColor:
+              theme.colorScheme === "dark" ? theme.colors.dark[8] : theme.colors.gray[0],
+            "&:not(:last-of-type)": {
+              borderBottom: `1px solid ${
+                theme.colorScheme === "dark" ? theme.colors.dark[4] : theme.colors.gray[3]
+              }`,
+            },
+          }}
+        >
+          <Group pl="md">
+            <Text size={"lg"}>{title}</Text>
+          </Group>
+          <Group>
+            <ActionIcon variant="filled" color="#09AB7A">
+              <IconMessageCircle size={16} color="white" />
+            </ActionIcon>
+          </Group>
+        </Group>
+
         {children}
       </AppShell>
     </>
