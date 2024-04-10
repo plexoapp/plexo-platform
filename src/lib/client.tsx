@@ -117,7 +117,7 @@ class URQLClientSingleton {
           }),
           fetchExchange,
         ],
-        requestPolicy: "network-only",
+        requestPolicy: "cache-and-network",
       });
     }
     return URQLClientSingleton.instance;

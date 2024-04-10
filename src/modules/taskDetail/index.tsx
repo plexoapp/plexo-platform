@@ -290,7 +290,7 @@ const TaskDetailPageContent = ({ task, isLoading }: TaskDetailProps) => {
 
   return (
     <Group p={"md"} sx={{ alignItems: "baseline" }}>
-      <Stack maw={860} m="auto" h={"100%"} sx={{ flexGrow: 1 }}>
+      <Stack maw={860} mx="auto" h={"100%"} sx={{ flexGrow: 1 }}>
         <Stack spacing={10}>
           <Group position="apart" className={classes.headerSections}>
             {isLoading ? (

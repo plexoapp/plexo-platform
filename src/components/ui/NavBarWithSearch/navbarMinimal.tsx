@@ -160,7 +160,7 @@ export function NavbarMinimal({
               <Menu.Item onClick={() => setNewTeamOpened(true)} icon={<Plus size={16} />}>
                 New Team
               </Menu.Item>
-              s
+
               <ScrollArea.Autosize mah={250}>
                 <Menu.Label>Teams</Menu.Label>
                 <TeamsMenuList />

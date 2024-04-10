@@ -23,6 +23,7 @@ import { useQuery, useSubscription } from "urql";
 import { v4 as uuidv4 } from "uuid";
 import { formateDate } from "./utils";
 import MessagesSkeleton from "./Skeleton";
+import { getHotkeyHandler } from "@mantine/hooks";
 
 type SelectDataProps = {
   value: string;
@@ -72,16 +73,19 @@ const Chat = ({ chatOpened }: ChatProps) => {
   const theme = useMantineTheme();
   const { colorScheme } = useMantineColorScheme();
   const { projectsData, isLoadingProjects, setChatOpened } = usePlexoContext();
+
   const [projects, setProjects] = useState<SelectDataProps[]>([]);
-  const [value, setValue] = useState("");
+  const [inputMessage, setInputMessage] = useState("");
   const [message, setMessage] = useState("");
   const [messagesData, setMessagesData] = useState<MessageProps[]>([]);
   const [isTyping, setIsTyping] = useState(false);
 
+  const viewport = useRef<HTMLDivElement>(null);
+
   const assistantDarkBg =
     theme.colorScheme === "dark" ? theme.colors.brand[9] : theme.colors.green[1];
 
-  const [{ data: chat }, sendMessage] = useSubscription({
+  const [{ data: chat }, handlerSubscription] = useSubscription({
     pause: true,
     query: SendMessageDocument,
     variables: {
@@ -130,20 +134,19 @@ const Chat = ({ chatOpened }: ChatProps) => {
   useEffect(() => {
     if (chat) {
       if (chat.chat.messageId) {
-        const formatDate = formateDate(new Date());
-
+        // Add message to the list
         setMessagesData([
           ...messagesData,
           {
             id: chat.chat.messageId,
             role: "assistant",
             message: chat.chat.message,
-            createdAt: formatDate,
+            createdAt: formateDate(new Date()),
           },
         ]);
 
-        setMessage("");
         setIsTyping(false);
+        setMessage("");
       } else {
         setIsTyping(true);
       }
@@ -155,26 +158,23 @@ const Chat = ({ chatOpened }: ChatProps) => {
   }, [messagesData]);
 
   const handleSendMessage = () => {
-    setMessage(value);
-
-    const formatDate = formateDate(new Date());
+    //Add message to the list
     setMessagesData([
       ...messagesData,
       {
         id: uuidv4(),
         role: "user",
-        message: value,
-        createdAt: formatDate,
+        message: message,
+        createdAt: formateDate(new Date()),
       },
     ]);
 
-    sendMessage();
-
-    // Clean input
-    setValue("");
+    //Execute subscription
+    if (message.trim() !== "") {
+      handlerSubscription();
+      setInputMessage("");
+    }
   };
-
-  const viewport = useRef<HTMLDivElement>(null);
 
   return (
     <Aside width={{ sm: 350 }} hiddenBreakpoint="md" hidden={!chatOpened}>
@@ -241,18 +241,23 @@ const Chat = ({ chatOpened }: ChatProps) => {
           variant="default"
           radius={"xl"}
           size="sm"
-          placeholder="Write something..."
+          placeholder="Ask Plexo..."
           rightSectionWidth={42}
-          value={value}
-          onChange={event => setValue(event.currentTarget.value)}
-          /* onKeyDown={value.length ? getHotkeyHandler([["Enter", handleSendMessage]]) : undefined} */
+          value={inputMessage}
+          onChange={event => {
+            setInputMessage(event.currentTarget.value);
+            setMessage(event.currentTarget.value);
+          }}
+          onKeyDown={
+            message.trim() === "" ? undefined : getHotkeyHandler([["Enter", handleSendMessage]])
+          }
           rightSection={
             <ActionIcon
               size={32}
               variant="transparent"
               color={theme.primaryColor}
               onClick={() => handleSendMessage()}
-              disabled={value.length ? false : true}
+              disabled={message.trim() === "" ? true : false}
             >
               <Send size={18} strokeWidth={1.5} />
             </ActionIcon>
