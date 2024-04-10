@@ -101,7 +101,7 @@ const Layout = ({ pageTitle, button, children }: LayoutProps) => {
       </Drawer>
 
       <Drawer
-        size={300}
+        size={350}
         padding={0}
         position="right"
         className={classes.drawer}

@@ -27,7 +27,7 @@
     "@types/uuid": "^9.0.8",
     "@urql/devtools": "2.0.3",
     "cookies-next": "^2.1.1",
-    "dayjs": "^1.11.7",
+    "dayjs": "^1.11.10",
     "framer-motion": "10.12.17",
     "graphql": "16.7.1",
     "graphql-ws": "^5.11.2",

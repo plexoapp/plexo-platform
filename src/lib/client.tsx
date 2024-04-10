@@ -69,7 +69,7 @@ class URQLClientSingleton {
   // private static endpoint = "";
   // private static wsEndpoint = "";
 
-  public static getClient(graphQLEndpoint: string, graphQLWsEndpoint: string) {
+  public static getClient(graphQLEndpoint: string, graphQLWsEndpoint: string, authCookie: string) {
     const GRAPHQL_ENDPOINT = graphQLEndpoint;
     const GRAPHQL_WS_ENDPOINT = graphQLWsEndpoint;
 
@@ -107,7 +107,7 @@ class URQLClientSingleton {
                     unsubscribe: createWSClient({
                       url: GRAPHQL_WS_ENDPOINT,
                       connectionParams: {
-                        Authorization: "",
+                        Authorization: authCookie,
                       },
                     }).subscribe(input, sink),
                   };

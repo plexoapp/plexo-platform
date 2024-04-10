@@ -1,0 +1,22 @@
+subscription Chat($message: String!) {
+  chat(input: { chatId: "0f8a8ada-6dc6-46cd-a57c-5bc2b8d0e172", message: $message }) {
+    delta
+    message
+    messageId
+  }
+}
+
+query Messages {
+  messages(
+    input: {
+      filter: { chatId: "0f8a8ada-6dc6-46cd-a57c-5bc2b8d0e172" }
+      sortBy: "created_at"
+      sortOrder: DESC
+      limit: 20
+    }
+  ) {
+    id
+    content
+    createdAt
+  }
+}
