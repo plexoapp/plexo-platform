@@ -30,7 +30,7 @@ const TeamPage: NextPageWithLayout = () => {
 };
 
 TeamPage.getLayout = function getLayout(page: ReactElement) {
-  return <Layout>{page}</Layout>;
+  return <Layout pageTitle="Team">{page}</Layout>;
 };
 
 export default TeamPage;

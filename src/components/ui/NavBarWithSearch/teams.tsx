@@ -1,11 +1,11 @@
-import { Navbar, NavLink, Skeleton, Stack, useMantineTheme } from "@mantine/core";
+import { Menu, Navbar, NavLink, Skeleton, Stack, useMantineTheme } from "@mantine/core";
 import { Dna } from "tabler-icons-react";
 import router from "next/router";
 
 import { Team } from "lib/types";
 import { usePlexoContext } from "context/PlexoContext";
 
-const TeamsList = () => {
+export const TeamsList = () => {
   const theme = useMantineTheme();
   const { teamsData, isLoadingTeams } = usePlexoContext();
 
@@ -41,4 +41,28 @@ const TeamsList = () => {
   );
 };
 
-export default TeamsList;
+export const TeamsMenuList = () => {
+  const theme = useMantineTheme();
+  const { teamsData, isLoadingTeams } = usePlexoContext();
+
+  const teams = teamsData
+    ?.sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime())
+    .map((t: Team, index: number) => {
+      return (
+        <Menu.Item
+          key={index}
+          icon={<Dna size={16} color={theme.colors.brand[6]} />}
+          onClick={() => router.push(`/teams/${t.id}`)}
+          styles={theme => ({
+            root: {
+              borderRadius: theme.radius.sm,
+            },
+          })}
+        >
+          {t.name}
+        </Menu.Item>
+      );
+    });
+
+  return teams;
+};

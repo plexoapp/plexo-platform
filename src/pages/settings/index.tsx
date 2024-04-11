@@ -20,7 +20,7 @@ const SettingsPage: NextPageWithLayout = () => {
 };
 
 SettingsPage.getLayout = function getLayout(page: ReactElement) {
-  return <Layout>{page}</Layout>;
+  return <Layout pageTitle="Settings">{page}</Layout>;
 };
 
 export default SettingsPage;

@@ -20,7 +20,7 @@ const TasksPage: NextPageWithLayout = () => {
 };
 
 TasksPage.getLayout = function getLayout(page: ReactElement) {
-  return <Layout>{page}</Layout>;
+  return <Layout pageTitle="Tasks">{page}</Layout>;
 };
 
 export default TasksPage;
