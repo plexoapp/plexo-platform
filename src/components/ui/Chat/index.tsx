@@ -4,7 +4,6 @@ import {
   Group,
   Paper,
   Stack,
-  TextInput,
   rem,
   Text,
   useMantineTheme,
@@ -12,25 +11,23 @@ import {
   Aside,
   ScrollArea,
   Loader,
+  Textarea,
+  Alert,
 } from "@mantine/core";
 
 import PlexoUserImage from "components/resources/PlexoUserImage";
 import { usePlexoContext } from "context/PlexoContext";
-import { MessagesDocument, SendMessageDocument } from "integration/graphql";
+import { GetMessagesDocument, SendMessageDocument } from "integration/graphql";
 import { useEffect, useRef, useState } from "react";
-import { Send } from "tabler-icons-react";
+import { InfoCircle, Send } from "tabler-icons-react";
 import { useQuery, useSubscription } from "urql";
 import { v4 as uuidv4 } from "uuid";
 import { formateDate } from "./utils";
 import MessagesSkeleton from "./Skeleton";
 import { getHotkeyHandler } from "@mantine/hooks";
+import ChatProjectSelector from "./ProjectSelector";
 
-type SelectDataProps = {
-  value: string;
-  label: string;
-};
-
-type MessageProps = {
+export type MessageProps = {
   id: string;
   role: string;
   message: string;
@@ -69,32 +66,79 @@ const Message = ({ message }: { message: MessageProps }) => {
   );
 };
 
+type MessageListProps = {
+  isLoadingMessages: boolean;
+  isTyping: boolean;
+  messagesData: MessageProps[] | null;
+};
+
+const MessageList = ({ isLoadingMessages, isTyping, messagesData }: MessageListProps) => {
+  const theme = useMantineTheme();
+  const assistantDarkBg =
+    theme.colorScheme === "dark" ? theme.colors.brand[9] : theme.colors.green[1];
+
+  return isLoadingMessages ? (
+    <MessagesSkeleton />
+  ) : (
+    <Stack>
+      {messagesData ? (
+        messagesData.length ? (
+          messagesData.map(item => {
+            return <Message key={item.id} message={item} />;
+          })
+        ) : (
+          <Group py={"100%"}>
+            <Alert color="gray" maw={250} m={"auto"} icon={<InfoCircle size="1rem" />}>
+              <Text>No hay mensajes.</Text>
+            </Alert>
+          </Group>
+        )
+      ) : null}
+
+      {isTyping && (
+        <Paper
+          px="xs"
+          sx={{
+            backgroundColor: assistantDarkBg,
+            alignSelf: "flex-start",
+          }}
+        >
+          <Loader size={"xs"} color="white" variant="dots" />
+        </Paper>
+      )}
+    </Stack>
+  );
+};
+
 const Chat = ({ chatOpened }: ChatProps) => {
   const theme = useMantineTheme();
   const { colorScheme } = useMantineColorScheme();
-  const { projectsData, isLoadingProjects, setChatOpened } = usePlexoContext();
+  const { setChatOpened } = usePlexoContext();
 
-  const [projects, setProjects] = useState<SelectDataProps[]>([]);
   const [inputMessage, setInputMessage] = useState("");
   const [message, setMessage] = useState("");
-  const [messagesData, setMessagesData] = useState<MessageProps[]>([]);
+  const [chatId, setChatId] = useState<string | null>(null);
+  const [messagesData, setMessagesData] = useState<MessageProps[] | null>(null);
+  const [selectedProject, setSelectedProject] = useState<string | null>(null);
   const [isTyping, setIsTyping] = useState(false);
 
   const viewport = useRef<HTMLDivElement>(null);
-
-  const assistantDarkBg =
-    theme.colorScheme === "dark" ? theme.colors.brand[9] : theme.colors.green[1];
 
   const [{ data: chat }, handlerSubscription] = useSubscription({
     pause: true,
     query: SendMessageDocument,
     variables: {
+      chatId: chatId,
       message: message,
     },
   });
 
-  const [{ data: messages, fetching: isLoadingMessages }] = useQuery({
-    query: MessagesDocument,
+  const [{ data: messages, fetching: isLoadingMessages }, handlerGetMessages] = useQuery({
+    pause: true,
+    query: GetMessagesDocument,
+    variables: {
+      chatId: chatId,
+    },
   });
 
   useEffect(() => {
@@ -120,23 +164,10 @@ const Chat = ({ chatOpened }: ChatProps) => {
   }, [messages]);
 
   useEffect(() => {
-    const getPorts = () => {
-      const parseData: SelectDataProps[] = projectsData
-        ? projectsData.map(item => {
-            return { value: item.id, label: item.name };
-          })
-        : [];
-      setProjects(parseData);
-    };
-    getPorts();
-  }, [projectsData]);
-
-  useEffect(() => {
     if (chat) {
       if (chat.chat.messageId) {
-        // Add message to the list
-        setMessagesData([
-          ...messagesData,
+        setMessagesData(prevMessagesData => [
+          ...(prevMessagesData ?? []),
           {
             id: chat.chat.messageId,
             role: "assistant",
@@ -155,12 +186,19 @@ const Chat = ({ chatOpened }: ChatProps) => {
 
   useEffect(() => {
     viewport.current!.scrollTo({ top: viewport.current!.scrollHeight, behavior: "smooth" });
-  }, [messagesData]);
+  }, [messagesData, isTyping]);
+
+  // Set chatId after created it
+  useEffect(() => {
+    if (chatId) {
+      handlerGetMessages();
+    }
+  }, [chatId]);
 
   const handleSendMessage = () => {
     //Add message to the list
-    setMessagesData([
-      ...messagesData,
+    setMessagesData(prevMessagesData => [
+      ...(prevMessagesData ?? []),
       {
         id: uuidv4(),
         role: "user",
@@ -178,91 +216,93 @@ const Chat = ({ chatOpened }: ChatProps) => {
 
   return (
     <Aside width={{ sm: 350 }} hiddenBreakpoint="md" hidden={!chatOpened}>
-      <Aside.Section>
+      <Aside.Section
+        bg={theme.colorScheme === "dark" ? theme.colors.dark[6] : theme.colors.gray[1]}
+      >
         <Group
           p={"sm"}
-          h={73}
           sx={{
             borderBottom: `${rem(1)} solid ${
               theme.colorScheme === "dark" ? theme.colors.dark[4] : theme.colors.gray[3]
             }`,
           }}
         >
-          <Group position="apart" w={"100%"}>
-            <Group /* sx={{ flex: 1 }} */>
-              <PlexoUserImage
-                scale={0.12}
-                backgroundColor={colorScheme === "light" ? theme.colors.gray[1] : undefined}
+          <Stack w={"100%"}>
+            <Group position="apart">
+              <Group>
+                <PlexoUserImage
+                  scale={0.12}
+                  backgroundColor={colorScheme === "light" ? theme.colors.gray[1] : undefined}
+                />
+                <Text size={"sm"}>Plexo</Text>
+              </Group>
+
+              <CloseButton
+                aria-label="Close chat"
+                onClick={() => setChatOpened(false)}
+                color={theme.primaryColor}
               />
-              <Text size={"sm"}>Plexo</Text>
             </Group>
-            {/* <Select
-            variant="filled"
-            size="xs"
-            disabled={isLoadingProjects}
-            placeholder="Select a project"
-            data={projects}
-          /> */}
-            <CloseButton
-              aria-label="Close chat"
-              onClick={() => setChatOpened(false)}
-              color={theme.primaryColor}
+
+            <ChatProjectSelector
+              setChatId={setChatId}
+              selectedProject={selectedProject}
+              setSelectedProject={setSelectedProject}
             />
-          </Group>
+          </Stack>
         </Group>
       </Aside.Section>
 
       <Aside.Section grow p={"sm"} component={ScrollArea} viewportRef={viewport}>
-        {isLoadingMessages ? (
-          <MessagesSkeleton />
+        {selectedProject ? (
+          <MessageList
+            isLoadingMessages={isLoadingMessages}
+            isTyping={isTyping}
+            messagesData={messagesData}
+          />
         ) : (
-          <Stack>
-            {messagesData.map(item => {
-              return <Message key={item.id} message={item} />;
-            })}
-            {isTyping && (
-              <Paper
-                px="xs"
-                sx={{
-                  backgroundColor: assistantDarkBg,
-                  alignSelf: "flex-start",
-                }}
-              >
-                <Loader size={"xs"} color="white" variant="dots" />
-              </Paper>
-            )}
-          </Stack>
+          <Group py={"100%"}>
+            <Alert color="gray" maw={250} m={"auto"} icon={<InfoCircle size="1rem" />}>
+              <Text>Choose a project to view chat messages.</Text>
+            </Alert>
+          </Group>
         )}
       </Aside.Section>
 
-      <Aside.Section p={"sm"}>
-        <TextInput
-          autoFocus
-          variant="default"
-          radius={"xl"}
-          size="sm"
-          placeholder="Ask Plexo..."
-          rightSectionWidth={42}
-          value={inputMessage}
-          onChange={event => {
-            setInputMessage(event.currentTarget.value);
-            setMessage(event.currentTarget.value);
-          }}
-          onKeyDown={
-            message.trim() === "" ? undefined : getHotkeyHandler([["Enter", handleSendMessage]])
-          }
-          rightSection={
-            <ActionIcon
-              size={32}
-              variant="transparent"
-              color={theme.primaryColor}
-              onClick={() => handleSendMessage()}
-              disabled={message.trim() === "" ? true : false}
-            >
-              <Send size={18} strokeWidth={1.5} />
-            </ActionIcon>
-          }
-        />
+      <Aside.Section
+        p={"sm"}
+        bg={theme.colorScheme === "dark" ? theme.colors.dark[6] : theme.colors.gray[1]}
+      >
+        <Group spacing={"xs"}>
+          <Textarea
+            autosize
+            minRows={1}
+            maxRows={4}
+            variant="default"
+            radius="sm"
+            size="sm"
+            placeholder="Ask Plexo..."
+            value={inputMessage}
+            disabled={selectedProject ? false : true}
+            onChange={event => {
+              setInputMessage(event.currentTarget.value);
+              setMessage(event.currentTarget.value);
+            }}
+            onKeyDown={
+              message.trim() === "" ? undefined : getHotkeyHandler([["Enter", handleSendMessage]])
+            }
+            sx={{ flex: 1 }}
+          />
+          <ActionIcon
+            size="lg"
+            variant="subtle"
+            color={theme.primaryColor}
+            onClick={() => handleSendMessage()}
+            disabled={message.trim() !== "" || selectedProject ? false : true}
+          >
+            <Send size={18} strokeWidth={1.5} />
+          </ActionIcon>
+        </Group>
       </Aside.Section>
     </Aside>
   );

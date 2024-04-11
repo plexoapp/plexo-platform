@@ -1,19 +1,28 @@
-subscription Chat($message: String!) {
-  chat(input: { chatId: "0f8a8ada-6dc6-46cd-a57c-5bc2b8d0e172", message: $message }) {
+subscription SendMessage($chatId: UUID!, $message: String!) {
+  chat(input: { chatId: $chatId, message: $message }) {
     delta
     message
     messageId
   }
 }
 
-query Messages {
+query GetChat($id: UUID) {
+  chats(input: { filter: { resourceId: $id } }) {
+    id
+    resourceId
+  }
+}
+
+mutation NewChat($resourceId: UUID!) {
+  createChat(input: { resourceId: $resourceId, resourceType: "project" }) {
+    id
+    resourceId
+  }
+}
+
+query GetMessages($chatId: UUID) {
   messages(
-    input: {
-      filter: { chatId: "0f8a8ada-6dc6-46cd-a57c-5bc2b8d0e172" }
-      sortBy: "created_at"
-      sortOrder: DESC
-      limit: 20
-    }
+    input: { filter: { chatId: $chatId }, sortBy: "created_at", sortOrder: DESC, limit: 20 }
   ) {
     id
     content
