@@ -71,7 +71,7 @@ PlexoApp.getInitialProps = ({ ctx }: { ctx: GetServerSidePropsContext }) => {
     viewMode: getCookie("viewMode", ctx) || "list",
     authCookie: getCookie("plexo-session-token", ctx) || "",
     plexoAPIEndpoint: process.env.PLEXO_API_ENDPOINT || "",
-    plexoWSEndpoint: process.env.NEXT_PUBLIC_WS_ENDPOINT || "",
+    plexoWSEndpoint: process.env.PLEXO_API_ENDPOINT?.replaceAll("http", "ws") || "",
   };
 };
 
