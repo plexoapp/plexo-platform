@@ -12,6 +12,11 @@ import {
   TaskChangesQuery,
 } from "integration/graphql";
 
+export type SelectDataProps = {
+  value: string;
+  label: string;
+};
+
 export type Task = TasksQuery["tasks"][number];
 export type TaskById = TaskByIdQuery["task"];
 export type Project = ProjectsQuery["projects"][number];

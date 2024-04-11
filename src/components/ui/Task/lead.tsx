@@ -109,7 +109,7 @@ export const GenericLeadTaskMenu = ({
               return (
                 <Menu.Item
                   key={m.id}
-                  icon={MemberPhoto(m.photoUrl)}
+                  icon={MemberPhoto(m)}
                   onClick={() => {
                     onSelect && onSelect(m);
                     task && onUpdateTaskLead(m.id);
@@ -192,11 +192,7 @@ export const ManualLeadTaskMenu = ({ children, task, tasks, setTasks }: ManualLe
           ) : (
             membersOptions.map(m => {
               return (
-                <Menu.Item
-                  key={m.id}
-                  icon={MemberPhoto(m.photoUrl)}
-                  onClick={() => onUpdateTaskLead(m)}
-                >
+                <Menu.Item key={m.id} icon={MemberPhoto(m)} onClick={() => onUpdateTaskLead(m)}>
                   {m.name}
                 </Menu.Item>
               );
@@ -217,7 +213,7 @@ type ManualLeadTaskSelectorProps = {
 export const ManualLeadTaskSelector = ({ task, tasks, setTasks }: ManualLeadTaskSelectorProps) => {
   return (
     <ManualLeadTaskMenu task={task} tasks={tasks} setTasks={setTasks}>
-      <ActionIcon variant="transparent">{MemberPhoto(task.lead?.photoUrl)}</ActionIcon>
+      <ActionIcon variant="transparent">{MemberPhoto(task.lead)}</ActionIcon>
     </ManualLeadTaskMenu>
   );
 };
@@ -232,9 +228,9 @@ export const LeadTaskSelector = ({ lead, setLead, type }: LeadTaskSelectorProps)
   return (
     <GenericLeadTaskMenu onSelect={member => setLead(member)} selectedLead={lead}>
       {type == "icon" ? (
-        <ActionIcon variant="transparent">{MemberPhoto(lead?.photoUrl)}</ActionIcon>
+        <ActionIcon variant="transparent">{MemberPhoto(lead)}</ActionIcon>
       ) : (
-        <Button compact variant="light" color={"gray"} leftIcon={MemberPhoto(lead?.photoUrl)}>
+        <Button compact variant="light" color={"gray"} leftIcon={MemberPhoto(lead)}>
           <Text size={"xs"}>{LeadName(lead)}</Text>
         </Button>
       )}
@@ -251,9 +247,9 @@ export const LeadSelectorByTask = ({ task, type }: LeadSelectorByTaskProps) => {
   return (
     <GenericLeadTaskMenu task={task}>
       {type == "icon" ? (
-        <ActionIcon variant="transparent">{MemberPhoto(task?.lead?.photoUrl)}</ActionIcon>
+        <ActionIcon variant="transparent">{MemberPhoto(task?.lead)}</ActionIcon>
       ) : (
-        <Button compact variant="light" color={"gray"} leftIcon={MemberPhoto(task?.lead?.photoUrl)}>
+        <Button compact variant="light" color={"gray"} leftIcon={MemberPhoto(task?.lead)}>
           <Text size={"xs"}>{LeadName(task?.lead)}</Text>
         </Button>
       )}

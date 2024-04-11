@@ -64,7 +64,6 @@ export const MembersSection = ({ data }: MembersSectionProps) => {
   const { userData } = usePlexoContext();
   const isAdmin = userData?.role === MemberRole.Admin;
 
-
   const toggleRow = (id: string) =>
     setSelection(current =>
       current.includes(id) ? current.filter(item => item !== id) : [...current, id]
@@ -81,15 +80,17 @@ export const MembersSection = ({ data }: MembersSectionProps) => {
           <td>
             {isAdmin && (
               <Checkbox
-              checked={selection.includes(item.id)}
-              onChange={() => toggleRow(item.id)}
-              transitionDuration={0}
+                checked={selection.includes(item.id)}
+                onChange={() => toggleRow(item.id)}
+                transitionDuration={0}
               />
             )}
           </td>
           <td>
             <Group spacing="sm">
-              <Avatar size={26} src={item.avatar} radius={26} />
+              <Avatar size={26} src={item.avatar} radius={26} color="brand">
+                {item.name[0]}
+              </Avatar>
               <Text size="sm" weight={500}>
                 {item.name}
               </Text>
@@ -134,9 +135,7 @@ export const MembersSection = ({ data }: MembersSectionProps) => {
                 <th>User</th>
                 <th>Email</th>
                 <th>Job</th>
-                  {isAdmin && (
-                    <th>Edit</th>
-                  )}
+                {isAdmin && <th>Edit</th>}
               </tr>
             </thead>
             <tbody>{rows}</tbody>

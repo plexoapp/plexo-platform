@@ -1,4 +1,4 @@
-import { Group, Modal, useMantineTheme, Text, TextInput, Button } from "@mantine/core";
+import { Group, Modal, useMantineTheme, Text, TextInput, Button, Textarea } from "@mantine/core";
 import { showNotification } from "@mantine/notifications";
 import { useState } from "react";
 import { Check, X } from "tabler-icons-react";
@@ -97,10 +97,12 @@ const NewTeam = ({ newTeamOpened, setNewTeamOpened }: NewTeamProps) => {
         },
       }}
     >
-      <TextInput
-        mb={15}
-        data-autoFocus
+      <Textarea
+        autosize
+        data-autofocus
         size="md"
+        minRows={1}
+        mb={15}
         placeholder="Team name"
         error={teamExists ? "Team already exists" : false}
         value={name}

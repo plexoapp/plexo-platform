@@ -44,7 +44,7 @@ const useStyles = createStyles(theme => ({
     },
   },
   badgeProject: {
-    [theme.fn.smallerThan("xs")]: {
+    [theme.fn.smallerThan("sm")]: {
       display: "none",
     },
   },

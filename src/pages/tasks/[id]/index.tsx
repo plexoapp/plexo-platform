@@ -7,6 +7,9 @@ import TaskDetailPageContent from "modules/taskDetail";
 import Layout from "components/ui/Layout";
 import { usePlexoContext } from "context/PlexoContext";
 import { TaskByIdDocument } from "integration/graphql";
+import Link from "next/link";
+import { ActionIcon } from "@mantine/core";
+import { ChevronLeft } from "tabler-icons-react";
 
 const TaskPage: NextPageWithLayout = () => {
   const router = useRouter();
@@ -30,7 +33,19 @@ const TaskPage: NextPageWithLayout = () => {
 };
 
 TaskPage.getLayout = function getLayout(page: ReactElement) {
-  return <Layout>{page}</Layout>;
+  return (
+    <Layout
+      button={
+        <Link href="/tasks" passHref>
+          <ActionIcon variant="subtle">
+            <ChevronLeft size={20} />
+          </ActionIcon>
+        </Link>
+      }
+    >
+      {page}
+    </Layout>
+  );
 };
 
 export default TaskPage;

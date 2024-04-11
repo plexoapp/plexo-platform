@@ -31,7 +31,7 @@ const ProjectPage: NextPageWithLayout = () => {
 };
 
 ProjectPage.getLayout = function getLayout(page: ReactElement) {
-  return <Layout>{page}</Layout>;
+  return <Layout pageTitle="Project">{page}</Layout>;
 };
 
 export default ProjectPage;

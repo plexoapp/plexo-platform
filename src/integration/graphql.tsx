@@ -66,17 +66,55 @@ export enum ChangeOperation {
 export enum ChangeResourceType {
   Assets = "ASSETS",
   Changes = "CHANGES",
+  Chats = "CHATS",
   Labels = "LABELS",
   Members = "MEMBERS",
+  Messages = "MESSAGES",
   Projects = "PROJECTS",
   Tasks = "TASKS",
   Teams = "TEAMS",
+}
+
+export type Chat = {
+  __typename?: "Chat";
+  createdAt: Scalars["DateTime"]["output"];
+  id: Scalars["UUID"]["output"];
+  owner: Member;
+  ownerId: Scalars["UUID"]["output"];
+  resourceId: Scalars["UUID"]["output"];
+  resourceType: Scalars["String"]["output"];
+  status: ChatStatus;
+  updatedAt: Scalars["DateTime"]["output"];
+};
+
+export type ChatResponseChunk = {
+  __typename?: "ChatResponseChunk";
+  delta: Scalars["String"]["output"];
+  message: Scalars["String"]["output"];
+  messageId?: Maybe<Scalars["UUID"]["output"]>;
+};
+
+export type ChatResponseInput = {
+  chatId: Scalars["UUID"]["input"];
+  message: Scalars["String"]["input"];
+};
+
+export enum ChatStatus {
+  Active = "ACTIVE",
+  Archived = "ARCHIVED",
+  None = "NONE",
 }
 
 export type CreateAssetInput = {
   kind?: InputMaybe<AssetKind>;
   name: Scalars["String"]["input"];
   projectId?: InputMaybe<Scalars["UUID"]["input"]>;
+};
+
+export type CreateChatInput = {
+  resourceId: Scalars["UUID"]["input"];
+  resourceType: Scalars["String"]["input"];
+  status?: InputMaybe<ChatStatus>;
 };
 
 export type CreateLabelInput = {
@@ -93,6 +131,15 @@ export type CreateMemberInput = {
   passwordHash?: InputMaybe<Scalars["String"]["input"]>;
   photoUrl?: InputMaybe<Scalars["String"]["input"]>;
   role: MemberRole;
+};
+
+export type CreateMessageInput = {
+  chatId: Scalars["UUID"]["input"];
+  content: Scalars["String"]["input"];
+  ownerId: Scalars["UUID"]["input"];
+  parentId?: InputMaybe<Scalars["UUID"]["input"]>;
+  resourceType: Scalars["String"]["input"];
+  status?: InputMaybe<MessageStatus>;
 };
 
 export type CreateProjectInput = {
@@ -171,6 +218,23 @@ export type GetChangesWhere = {
   resourceType?: InputMaybe<ChangeResourceType>;
 };
 
+export type GetChatsInput = {
+  filter?: InputMaybe<GetChatsWhere>;
+  limit?: InputMaybe<Scalars["Int"]["input"]>;
+  offset?: InputMaybe<Scalars["Int"]["input"]>;
+  sortBy?: InputMaybe<Scalars["String"]["input"]>;
+  sortOrder?: InputMaybe<SortOrder>;
+};
+
+export type GetChatsWhere = {
+  and?: InputMaybe<Array<GetChatsWhere>>;
+  ids?: InputMaybe<Array<Scalars["UUID"]["input"]>>;
+  or?: InputMaybe<Array<GetChatsWhere>>;
+  ownerId?: InputMaybe<Scalars["UUID"]["input"]>;
+  resourceId?: InputMaybe<Scalars["UUID"]["input"]>;
+  status?: InputMaybe<ChatStatus>;
+};
+
 export type GetLabelsInput = {
   filter?: InputMaybe<GetLabelsWhere>;
   limit?: InputMaybe<Scalars["Int"]["input"]>;
@@ -206,6 +270,23 @@ export type GetMembersWhere = {
   or?: InputMaybe<Array<GetMembersWhere>>;
   photoUrl?: InputMaybe<Scalars["String"]["input"]>;
   role?: InputMaybe<MemberRole>;
+};
+
+export type GetMessagesInput = {
+  filter?: InputMaybe<GetMessagesWhere>;
+  limit?: InputMaybe<Scalars["Int"]["input"]>;
+  offset?: InputMaybe<Scalars["Int"]["input"]>;
+  sortBy?: InputMaybe<Scalars["String"]["input"]>;
+  sortOrder?: InputMaybe<SortOrder>;
+};
+
+export type GetMessagesWhere = {
+  and?: InputMaybe<Array<GetMessagesWhere>>;
+  chatId?: InputMaybe<Scalars["UUID"]["input"]>;
+  ids?: InputMaybe<Array<Scalars["UUID"]["input"]>>;
+  or?: InputMaybe<Array<GetMessagesWhere>>;
+  parentId?: InputMaybe<Scalars["UUID"]["input"]>;
+  resourceId?: InputMaybe<Scalars["UUID"]["input"]>;
 };
 
 export type GetProjectsInput = {
@@ -317,26 +398,53 @@ export enum MemberRole {
   ReadOnly = "READ_ONLY",
 }
 
+export type Message = {
+  __typename?: "Message";
+  chat: Chat;
+  chatId: Scalars["UUID"]["output"];
+  content: Scalars["String"]["output"];
+  createdAt: Scalars["DateTime"]["output"];
+  id: Scalars["UUID"]["output"];
+  owner: Member;
+  ownerId: Scalars["UUID"]["output"];
+  parentId?: Maybe<Scalars["UUID"]["output"]>;
+  status: MessageStatus;
+  updatedAt: Scalars["DateTime"]["output"];
+};
+
+export enum MessageStatus {
+  Read = "READ",
+  Received = "RECEIVED",
+  Sent = "SENT",
+}
+
 export type MutationRoot = {
   __typename?: "MutationRoot";
+  chat: ChatResponseChunk;
   createAsset: Asset;
+  createChat: Chat;
   createLabel: Label;
   createMember: Member;
+  createMessage: Message;
   createProject: Project;
   createTask: Task;
   createTasks: Array<Task>;
   createTeam: Team;
   deleteAsset: Asset;
+  deleteChat: Chat;
   deleteLabel: Label;
   deleteMember: Member;
+  deleteMessage: Message;
   deleteProject: Project;
   deleteTask: Task;
   deleteTeam: Team;
   login: LoginResponse;
   register: LoginResponse;
   updateAsset: Asset;
+  updateChat: Chat;
   updateLabel: Label;
   updateMember: Member;
+  updateMessage: Message;
   updatePassword: Member;
   updateProfile: Member;
   updateProject: Project;
@@ -344,8 +452,16 @@ export type MutationRoot = {
   updateTeam: Team;
 };
 
+export type MutationRootChatArgs = {
+  input: ChatResponseInput;
+};
+
 export type MutationRootCreateAssetArgs = {
   input: CreateAssetInput;
+};
+
+export type MutationRootCreateChatArgs = {
+  input: CreateChatInput;
 };
 
 export type MutationRootCreateLabelArgs = {
@@ -354,6 +470,10 @@ export type MutationRootCreateLabelArgs = {
 
 export type MutationRootCreateMemberArgs = {
   input: CreateMemberInput;
+};
+
+export type MutationRootCreateMessageArgs = {
+  input: CreateMessageInput;
 };
 
 export type MutationRootCreateProjectArgs = {
@@ -376,11 +496,19 @@ export type MutationRootDeleteAssetArgs = {
   id: Scalars["UUID"]["input"];
 };
 
+export type MutationRootDeleteChatArgs = {
+  id: Scalars["UUID"]["input"];
+};
+
 export type MutationRootDeleteLabelArgs = {
   id: Scalars["UUID"]["input"];
 };
 
 export type MutationRootDeleteMemberArgs = {
+  id: Scalars["UUID"]["input"];
+};
+
+export type MutationRootDeleteMessageArgs = {
   id: Scalars["UUID"]["input"];
 };
 
@@ -412,6 +540,11 @@ export type MutationRootUpdateAssetArgs = {
   input: UpdateAssetInput;
 };
 
+export type MutationRootUpdateChatArgs = {
+  id: Scalars["UUID"]["input"];
+  input: UpdateChatInput;
+};
+
 export type MutationRootUpdateLabelArgs = {
   id: Scalars["UUID"]["input"];
   input: UpdateLabelInput;
@@ -420,6 +553,11 @@ export type MutationRootUpdateLabelArgs = {
 export type MutationRootUpdateMemberArgs = {
   id: Scalars["UUID"]["input"];
   input: UpdateMemberInput;
+};
+
+export type MutationRootUpdateMessageArgs = {
+  id: Scalars["UUID"]["input"];
+  input: UpdateMessageInput;
 };
 
 export type MutationRootUpdatePasswordArgs = {
@@ -515,11 +653,15 @@ export type QueryRoot = {
   assets: Array<Asset>;
   change: Change;
   changes: Array<Change>;
+  chat: Chat;
+  chats: Array<Chat>;
   label: Label;
   labels: Array<Label>;
   me: Member;
   member: Member;
   members: Array<Member>;
+  message: Message;
+  messages: Array<Message>;
   project: Project;
   projects: Array<Project>;
   subdivideTask: Array<TaskSuggestion>;
@@ -547,6 +689,14 @@ export type QueryRootChangesArgs = {
   input?: InputMaybe<GetChangesInput>;
 };
 
+export type QueryRootChatArgs = {
+  id: Scalars["UUID"]["input"];
+};
+
+export type QueryRootChatsArgs = {
+  input?: InputMaybe<GetChatsInput>;
+};
+
 export type QueryRootLabelArgs = {
   id: Scalars["UUID"]["input"];
 };
@@ -561,6 +711,14 @@ export type QueryRootMemberArgs = {
 
 export type QueryRootMembersArgs = {
   input?: InputMaybe<GetMembersInput>;
+};
+
+export type QueryRootMessageArgs = {
+  id: Scalars["UUID"]["input"];
+};
+
+export type QueryRootMessagesArgs = {
+  input?: InputMaybe<GetMessagesInput>;
 };
 
 export type QueryRootProjectArgs = {
@@ -613,11 +771,18 @@ export type SubdivideTaskInput = {
 export type SubscriptionRoot = {
   __typename?: "SubscriptionRoot";
   assets: ListenEvent;
+  chat: ChatResponseChunk;
+  chats: ListenEvent;
   labels: ListenEvent;
   members: ListenEvent;
+  messages: ListenEvent;
   projects: ListenEvent;
   tasks: ListenEvent;
   teams: ListenEvent;
+};
+
+export type SubscriptionRootChatArgs = {
+  input: ChatResponseInput;
 };
 
 export type Task = {
@@ -708,6 +873,10 @@ export type UpdateAssetInput = {
   projectId?: InputMaybe<Scalars["UUID"]["input"]>;
 };
 
+export type UpdateChatInput = {
+  status?: InputMaybe<ChatStatus>;
+};
+
 export type UpdateLabelInput = {
   color?: InputMaybe<Scalars["String"]["input"]>;
   description?: InputMaybe<Scalars["String"]["input"]>;
@@ -727,6 +896,11 @@ export type UpdateMemberInput = {
   passwordHash?: InputMaybe<Scalars["String"]["input"]>;
   photoUrl?: InputMaybe<Scalars["String"]["input"]>;
   role?: InputMaybe<MemberRole>;
+};
+
+export type UpdateMessageInput = {
+  content?: InputMaybe<Scalars["String"]["input"]>;
+  status?: InputMaybe<MessageStatus>;
 };
 
 export type UpdatePasswordInput = {
@@ -795,6 +969,48 @@ export type LoginMutationVariables = Exact<{
 export type LoginMutation = {
   __typename?: "MutationRoot";
   login: { __typename?: "LoginResponse"; token: string };
+};
+
+export type SendMessageSubscriptionVariables = Exact<{
+  chatId: Scalars["UUID"]["input"];
+  message: Scalars["String"]["input"];
+}>;
+
+export type SendMessageSubscription = {
+  __typename?: "SubscriptionRoot";
+  chat: {
+    __typename?: "ChatResponseChunk";
+    delta: string;
+    message: string;
+    messageId?: any | null;
+  };
+};
+
+export type GetChatQueryVariables = Exact<{
+  id?: InputMaybe<Scalars["UUID"]["input"]>;
+}>;
+
+export type GetChatQuery = {
+  __typename?: "QueryRoot";
+  chats: Array<{ __typename?: "Chat"; id: any; resourceId: any }>;
+};
+
+export type NewChatMutationVariables = Exact<{
+  resourceId: Scalars["UUID"]["input"];
+}>;
+
+export type NewChatMutation = {
+  __typename?: "MutationRoot";
+  createChat: { __typename?: "Chat"; id: any; resourceId: any };
+};
+
+export type GetMessagesQueryVariables = Exact<{
+  chatId?: InputMaybe<Scalars["UUID"]["input"]>;
+}>;
+
+export type GetMessagesQuery = {
+  __typename?: "QueryRoot";
+  messages: Array<{ __typename?: "Message"; id: any; content: string; createdAt: any }>;
 };
 
 export type LabelsQueryVariables = Exact<{ [key: string]: never }>;
@@ -1349,6 +1565,261 @@ export const LoginDocument = {
     },
   ],
 } as unknown as DocumentNode<LoginMutation, LoginMutationVariables>;
+export const SendMessageDocument = {
+  kind: "Document",
+  definitions: [
+    {
+      kind: "OperationDefinition",
+      operation: "subscription",
+      name: { kind: "Name", value: "SendMessage" },
+      variableDefinitions: [
+        {
+          kind: "VariableDefinition",
+          variable: { kind: "Variable", name: { kind: "Name", value: "chatId" } },
+          type: {
+            kind: "NonNullType",
+            type: { kind: "NamedType", name: { kind: "Name", value: "UUID" } },
+          },
+        },
+        {
+          kind: "VariableDefinition",
+          variable: { kind: "Variable", name: { kind: "Name", value: "message" } },
+          type: {
+            kind: "NonNullType",
+            type: { kind: "NamedType", name: { kind: "Name", value: "String" } },
+          },
+        },
+      ],
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "chat" },
+            arguments: [
+              {
+                kind: "Argument",
+                name: { kind: "Name", value: "input" },
+                value: {
+                  kind: "ObjectValue",
+                  fields: [
+                    {
+                      kind: "ObjectField",
+                      name: { kind: "Name", value: "chatId" },
+                      value: { kind: "Variable", name: { kind: "Name", value: "chatId" } },
+                    },
+                    {
+                      kind: "ObjectField",
+                      name: { kind: "Name", value: "message" },
+                      value: { kind: "Variable", name: { kind: "Name", value: "message" } },
+                    },
+                  ],
+                },
+              },
+            ],
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                { kind: "Field", name: { kind: "Name", value: "delta" } },
+                { kind: "Field", name: { kind: "Name", value: "message" } },
+                { kind: "Field", name: { kind: "Name", value: "messageId" } },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<SendMessageSubscription, SendMessageSubscriptionVariables>;
+export const GetChatDocument = {
+  kind: "Document",
+  definitions: [
+    {
+      kind: "OperationDefinition",
+      operation: "query",
+      name: { kind: "Name", value: "GetChat" },
+      variableDefinitions: [
+        {
+          kind: "VariableDefinition",
+          variable: { kind: "Variable", name: { kind: "Name", value: "id" } },
+          type: { kind: "NamedType", name: { kind: "Name", value: "UUID" } },
+        },
+      ],
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "chats" },
+            arguments: [
+              {
+                kind: "Argument",
+                name: { kind: "Name", value: "input" },
+                value: {
+                  kind: "ObjectValue",
+                  fields: [
+                    {
+                      kind: "ObjectField",
+                      name: { kind: "Name", value: "filter" },
+                      value: {
+                        kind: "ObjectValue",
+                        fields: [
+                          {
+                            kind: "ObjectField",
+                            name: { kind: "Name", value: "resourceId" },
+                            value: { kind: "Variable", name: { kind: "Name", value: "id" } },
+                          },
+                        ],
+                      },
+                    },
+                  ],
+                },
+              },
+            ],
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                { kind: "Field", name: { kind: "Name", value: "id" } },
+                { kind: "Field", name: { kind: "Name", value: "resourceId" } },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<GetChatQuery, GetChatQueryVariables>;
+export const NewChatDocument = {
+  kind: "Document",
+  definitions: [
+    {
+      kind: "OperationDefinition",
+      operation: "mutation",
+      name: { kind: "Name", value: "NewChat" },
+      variableDefinitions: [
+        {
+          kind: "VariableDefinition",
+          variable: { kind: "Variable", name: { kind: "Name", value: "resourceId" } },
+          type: {
+            kind: "NonNullType",
+            type: { kind: "NamedType", name: { kind: "Name", value: "UUID" } },
+          },
+        },
+      ],
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "createChat" },
+            arguments: [
+              {
+                kind: "Argument",
+                name: { kind: "Name", value: "input" },
+                value: {
+                  kind: "ObjectValue",
+                  fields: [
+                    {
+                      kind: "ObjectField",
+                      name: { kind: "Name", value: "resourceId" },
+                      value: { kind: "Variable", name: { kind: "Name", value: "resourceId" } },
+                    },
+                    {
+                      kind: "ObjectField",
+                      name: { kind: "Name", value: "resourceType" },
+                      value: { kind: "StringValue", value: "project", block: false },
+                    },
+                  ],
+                },
+              },
+            ],
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                { kind: "Field", name: { kind: "Name", value: "id" } },
+                { kind: "Field", name: { kind: "Name", value: "resourceId" } },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<NewChatMutation, NewChatMutationVariables>;
+export const GetMessagesDocument = {
+  kind: "Document",
+  definitions: [
+    {
+      kind: "OperationDefinition",
+      operation: "query",
+      name: { kind: "Name", value: "GetMessages" },
+      variableDefinitions: [
+        {
+          kind: "VariableDefinition",
+          variable: { kind: "Variable", name: { kind: "Name", value: "chatId" } },
+          type: { kind: "NamedType", name: { kind: "Name", value: "UUID" } },
+        },
+      ],
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "messages" },
+            arguments: [
+              {
+                kind: "Argument",
+                name: { kind: "Name", value: "input" },
+                value: {
+                  kind: "ObjectValue",
+                  fields: [
+                    {
+                      kind: "ObjectField",
+                      name: { kind: "Name", value: "filter" },
+                      value: {
+                        kind: "ObjectValue",
+                        fields: [
+                          {
+                            kind: "ObjectField",
+                            name: { kind: "Name", value: "chatId" },
+                            value: { kind: "Variable", name: { kind: "Name", value: "chatId" } },
+                          },
+                        ],
+                      },
+                    },
+                    {
+                      kind: "ObjectField",
+                      name: { kind: "Name", value: "sortBy" },
+                      value: { kind: "StringValue", value: "created_at", block: false },
+                    },
+                    {
+                      kind: "ObjectField",
+                      name: { kind: "Name", value: "sortOrder" },
+                      value: { kind: "EnumValue", value: "DESC" },
+                    },
+                    {
+                      kind: "ObjectField",
+                      name: { kind: "Name", value: "limit" },
+                      value: { kind: "IntValue", value: "20" },
+                    },
+                  ],
+                },
+              },
+            ],
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                { kind: "Field", name: { kind: "Name", value: "id" } },
+                { kind: "Field", name: { kind: "Name", value: "content" } },
+                { kind: "Field", name: { kind: "Name", value: "createdAt" } },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<GetMessagesQuery, GetMessagesQueryVariables>;
 export const LabelsDocument = {
   kind: "Document",
   definitions: [

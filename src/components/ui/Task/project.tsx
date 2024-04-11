@@ -160,33 +160,35 @@ export const GenericProjectsMenu = ({ children, onSelect, task }: GenericProject
           rightSection={<Kbd px={8}>P</Kbd>}
         ></TextInput>
         <Menu.Divider />
-        <Menu.Item
-          icon={<ProjectIcon />}
-          onClick={() => {
-            onSelect && onSelect(null);
-            task && onUpdateTaskProject(noMemberId);
-          }}
-        >
-          No project
-        </Menu.Item>
-        {isLoadingProjects ? (
-          <Skeleton height={36} radius="sm" />
-        ) : (
-          projectsOptions.map(p => {
-            return (
-              <Menu.Item
-                key={p.id}
-                icon={<ProjectIcon />}
-                onClick={() => {
-                  onSelect && onSelect(p);
-                  task && onUpdateTaskProject(p.id);
-                }}
-              >
-                {ProjectName(p)}
-              </Menu.Item>
-            );
-          })
-        )}
+        <ScrollArea.Autosize mah={250}>
+          <Menu.Item
+            icon={<ProjectIcon />}
+            onClick={() => {
+              onSelect && onSelect(null);
+              task && onUpdateTaskProject(noMemberId);
+            }}
+          >
+            No project
+          </Menu.Item>
+          {isLoadingProjects ? (
+            <Skeleton height={36} radius="sm" />
+          ) : (
+            projectsOptions.map(p => {
+              return (
+                <Menu.Item
+                  key={p.id}
+                  icon={<ProjectIcon />}
+                  onClick={() => {
+                    onSelect && onSelect(p);
+                    task && onUpdateTaskProject(p.id);
+                  }}
+                >
+                  {ProjectName(p)}
+                </Menu.Item>
+              );
+            })
+          )}
+        </ScrollArea.Autosize>
       </Menu.Dropdown>
     </Menu>
   );

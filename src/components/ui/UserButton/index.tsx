@@ -16,6 +16,7 @@ import { useRouter } from "next/router";
 import { ErrorNotification } from "lib/notifications";
 import { usePlexoContext } from "context/PlexoContext";
 import { UserPhoto } from "modules/profile";
+import { FloatingPosition } from "@mantine/core/lib/Floating";
 
 const useStyles = createStyles(theme => ({
   user: {
@@ -24,9 +25,9 @@ const useStyles = createStyles(theme => ({
     padding: theme.spacing.md,
     color: theme.colorScheme === "dark" ? theme.colors.dark[0] : theme.black,
 
-    "&:hover": {
+    /* "&:hover": {
       backgroundColor: theme.colorScheme === "dark" ? theme.colors.dark[8] : theme.colors.gray[0],
-    },
+    }, */
   },
 }));
 
@@ -34,9 +35,17 @@ interface UserButtonProps extends UnstyledButtonProps {
   logoutURL: string;
   isLoadingUser: boolean;
   user: User | undefined;
+  type: "icon" | "button";
+  menuPosition: FloatingPosition;
 }
 
-export function UserButton({ logoutURL, user, isLoadingUser }: UserButtonProps) {
+export function UserButton({
+  logoutURL,
+  user,
+  isLoadingUser,
+  type,
+  menuPosition,
+}: UserButtonProps) {
   const { classes } = useStyles();
   const plexo = usePlexoContext();
 
@@ -70,30 +79,33 @@ export function UserButton({ logoutURL, user, isLoadingUser }: UserButtonProps) 
 
   return (
     <Group position="center">
-      <Menu position={"bottom-end"} offset={0}>
+      <Menu position={menuPosition} offset={0}>
         <Menu.Target>
           <UnstyledButton className={classes.user}>
             {isLoadingUser ? (
               <Group>
                 <Skeleton height={38} circle />
-
-                <Stack spacing={0} sx={{ flex: 1 }}>
-                  <Skeleton height={10} mt={6} width="100%" radius="xs" />
-                  <Skeleton height={8} mt={6} width="100%" radius="xs" />
-                </Stack>
+                {type == "button" ? (
+                  <Stack spacing={0} sx={{ flex: 1 }}>
+                    <Skeleton height={10} mt={6} width="100%" radius="xs" />
+                    <Skeleton height={8} mt={6} width="100%" radius="xs" />
+                  </Stack>
+                ) : null}
               </Group>
             ) : (
               <Group>
                 <UserPhoto user={user} size="md" />
-                <Stack spacing={0}>
-                  <Text size="sm" weight={500}>
-                    {user?.name}
-                  </Text>
+                {type == "button" ? (
+                  <Stack spacing={0}>
+                    <Text size="sm" weight={500}>
+                      {user?.name}
+                    </Text>
 
-                  <Text color="dimmed" size="xs">
-                    {user?.email}
-                  </Text>
-                </Stack>
+                    <Text color="dimmed" size="xs">
+                      {user?.email}
+                    </Text>
+                  </Stack>
+                ) : null}
               </Group>
             )}
           </UnstyledButton>

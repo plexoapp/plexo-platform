@@ -51,7 +51,7 @@ export const MemberInfo = (member: Member | undefined) => {
   return (
     <Group spacing={5}>
       <Center w={26} h={26}>
-        {MemberPhoto(member?.photoUrl)}
+        {MemberPhoto(member)}
       </Center>
       {member?.name}
     </Group>

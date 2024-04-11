@@ -1,4 +1,4 @@
-import { Button, Group, Skeleton, Stack, TextInput, Textarea } from "@mantine/core";
+import { Button, Group, Skeleton, Stack, Textarea } from "@mantine/core";
 import { useForm } from "@mantine/form";
 
 import { useActions } from "lib/hooks/useActions";
@@ -67,8 +67,10 @@ export const TitleForm = ({ task, isLoading }: TitleFormProps) => {
   ) : (
     <form onSubmit={form.onSubmit(onUpdateTask)}>
       <Stack mb={"xl"}>
-        <TextInput
+        <Textarea
+          autosize
           size="lg"
+          minRows={1}
           variant="filled"
           placeholder="Task Title"
           styles={theme => ({
