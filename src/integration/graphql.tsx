@@ -1101,6 +1101,15 @@ export type UpdateMemberMutation = {
   updateMember: { __typename?: "Member"; id: any; name: string; email: string; role: MemberRole };
 };
 
+export type DeleteMemberMutationVariables = Exact<{
+  id: Scalars["UUID"]["input"];
+}>;
+
+export type DeleteMemberMutation = {
+  __typename?: "MutationRoot";
+  deleteMember: { __typename?: "Member"; id: any; name: string; email: string };
+};
+
 export type ProjectsQueryVariables = Exact<{ [key: string]: never }>;
 
 export type ProjectsQuery = {
@@ -2088,6 +2097,50 @@ export const UpdateMemberDocument = {
     },
   ],
 } as unknown as DocumentNode<UpdateMemberMutation, UpdateMemberMutationVariables>;
+export const DeleteMemberDocument = {
+  kind: "Document",
+  definitions: [
+    {
+      kind: "OperationDefinition",
+      operation: "mutation",
+      name: { kind: "Name", value: "DeleteMember" },
+      variableDefinitions: [
+        {
+          kind: "VariableDefinition",
+          variable: { kind: "Variable", name: { kind: "Name", value: "id" } },
+          type: {
+            kind: "NonNullType",
+            type: { kind: "NamedType", name: { kind: "Name", value: "UUID" } },
+          },
+        },
+      ],
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "deleteMember" },
+            arguments: [
+              {
+                kind: "Argument",
+                name: { kind: "Name", value: "id" },
+                value: { kind: "Variable", name: { kind: "Name", value: "id" } },
+              },
+            ],
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                { kind: "Field", name: { kind: "Name", value: "id" } },
+                { kind: "Field", name: { kind: "Name", value: "name" } },
+                { kind: "Field", name: { kind: "Name", value: "email" } },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<DeleteMemberMutation, DeleteMemberMutationVariables>;
 export const ProjectsDocument = {
   kind: "Document",
   definitions: [
