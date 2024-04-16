@@ -13,14 +13,13 @@ import {
   Loader,
   Textarea,
   Alert,
-  Tooltip,
 } from "@mantine/core";
 
 import PlexoUserImage from "components/resources/PlexoUserImage";
 import { usePlexoContext } from "context/PlexoContext";
 import { GetMessagesDocument, SendMessageDocument } from "integration/graphql";
-import { useEffect, useRef, useState } from "react";
-import { Check, InfoCircle, Send } from "tabler-icons-react";
+import { RefObject, useEffect, useRef, useState } from "react";
+import { InfoCircle, Send, X } from "tabler-icons-react";
 import { useQuery, useSubscription } from "urql";
 import { v4 as uuidv4 } from "uuid";
 import { formateDate } from "./utils";
@@ -28,12 +27,14 @@ import MessagesSkeleton from "./Skeleton";
 import { getHotkeyHandler } from "@mantine/hooks";
 import ChatProjectSelector from "./ProjectSelector";
 import { Member } from "lib/types";
-import { ManualLeadTaskSelector } from "../Task/lead";
+
+import ActionTaskButton from "./ActionTaskButton";
 
 export type TaskChat = {
   id: string;
   title: string;
-  /* lead: Member | null; */
+  lead: Member | null;
+  created: boolean;
 };
 
 export type MessageProps = {
@@ -76,29 +77,61 @@ const Message = ({ message }: { message: MessageProps }) => {
   );
 };
 
-const TaskList = ({ message }: { message: MessageProps }) => {
+const TaskList = ({
+  message,
+  viewport,
+}: {
+  message: MessageProps;
+  viewport: RefObject<HTMLDivElement>;
+}) => {
   const theme = useMantineTheme();
-  console.log(JSON.parse(message.message));
-  console.log(JSON.parse(message.message)?.input);
-  const messages = JSON.parse(message.message)?.input;
+
   const [tasks, setTasks] = useState<TaskChat[]>([]);
 
+  let tasksResponse = [];
+
   useEffect(() => {
-    setTasks([
-      ...messages.map((item: any) => ({
-        id: uuidv4(),
-        title: item.title,
-        /* lead: item.assignee_id */
-      })),
-      ...tasks,
-    ]);
-  }, [messages]);
+    const msg = message.message;
+    // Validar si existe mas de un input en la respuesta
+    if (msg.includes("}{")) {
+      // Separar JSON objects
+      const jsonStrings = msg.split("}{");
+
+      // Formatear JSON en un array
+      const jsonArrayString = "[" + jsonStrings.join("},{") + "]";
+
+      // Convertir JSON en objeto
+      tasksResponse = JSON.parse(jsonArrayString);
+    } else {
+      //  Convertir JSON en objeto
+      tasksResponse = [JSON.parse(msg)];
+    }
+
+    tasksResponse.map((obj: any) => {
+      // Mapear las tareas
+      setTasks([
+        ...tasks,
+        ...obj.input.map((item: any) => {
+          return {
+            id: uuidv4(),
+            title: item.title,
+            lead: null,
+            created: false,
+          };
+        }),
+      ]);
+    });
+  }, [message]);
+
+  useEffect(() => {
+    scrollToBottom(viewport);
+  }, [tasks]);
 
   return (
     <Stack spacing={"xs"}>
       <Paper
         key={message.id}
-        w={250}
+        w={"100%"}
         p="sm"
         sx={{
           backgroundColor:
@@ -106,28 +139,22 @@ const TaskList = ({ message }: { message: MessageProps }) => {
           alignSelf: "flex-start",
         }}
       >
-        {tasks?.map((item, index) => {
+        {tasks?.map((task, index) => {
           return (
             <Paper key={index} px={6} py={4} mt={1}>
               <Group spacing={0}>
-                {/* <Tooltip label={statusLabel(task.status)} position="bottom">
-            <ManualStatusSelector task={task} tasks={tasks} setTasks={setTasks} />
-          </Tooltip> */}
-                {/* <Tooltip label={task.lead?.name ? task.lead?.name : "No assignee"} position="bottom">
-            <ManualLeadTaskSelector task={task} tasks={tasks} setTasks={setTasks} />
-          </Tooltip> */}
+                {/* <Tooltip
+                  label={task.lead?.name ? task.lead?.name : "No assignee"}
+                  position="bottom"
+                >
+                  <ManualLeadTaskSelector task={task} tasks={tasks} setTasks={setTasks} />
+                </Tooltip> */}
 
                 <Text size={"sm"} sx={{ flex: 1 }}>
-                  {item.title}
+                  {task.title}
                 </Text>
 
-                <ActionIcon
-                  ml={4}
-                  size={"sm"}
-                  /* onClick={() => setTasks(tasks.filter(r => r.id !== task.id))} */
-                >
-                  <Check size={16} />
-                </ActionIcon>
+                <ActionTaskButton task={task} tasks={tasks} setTasks={setTasks} />
               </Group>
             </Paper>
           );
@@ -144,9 +171,10 @@ type MessageListProps = {
   isLoadingMessages: boolean;
   isTyping: boolean;
   messagesData: MessageProps[] | null;
+  viewport: RefObject<HTMLDivElement>;
 };
 
-const MessageList = ({ isLoadingMessages, isTyping, messagesData }: MessageListProps) => {
+const MessageList = ({ isLoadingMessages, isTyping, messagesData, viewport }: MessageListProps) => {
   const theme = useMantineTheme();
   const assistantDarkBg =
     theme.colorScheme === "dark" ? theme.colors.brand[9] : theme.colors.green[1];
@@ -158,12 +186,12 @@ const MessageList = ({ isLoadingMessages, isTyping, messagesData }: MessageListP
       {messagesData ? (
         messagesData.length ? (
           messagesData.map(item => {
-            return <Message key={item.id} message={item} />;
-            /* return item.type === "text" ? (
+            /* return <Message key={item.id} message={item} />; */
+            return item.type === "text" ? (
               <Message key={item.id} message={item} />
             ) : (
-              <TaskList key={item.id} message={item} />
-            ); */
+              <TaskList key={item.id} message={item} viewport={viewport} />
+            );
           })
         ) : (
           <Group py={"100%"}>
@@ -187,6 +215,10 @@ const MessageList = ({ isLoadingMessages, isTyping, messagesData }: MessageListP
       )}
     </Stack>
   );
+};
+
+const scrollToBottom = (viewport: RefObject<HTMLDivElement>) => {
+  viewport.current!.scrollTo({ top: viewport.current!.scrollHeight /* behavior: "smooth" */ });
 };
 
 const Chat = ({ chatOpened }: ChatProps) => {
@@ -249,7 +281,6 @@ const Chat = ({ chatOpened }: ChatProps) => {
       // Mensaje tipo tasks (tool calls)
       if (chat.chat.toolCalls) {
         if (chat.chat.messageId) {
-          /* console.log(JSON.parse(chat.chat.message)); */
           setMessagesData(prevMessagesData => [
             ...(prevMessagesData ?? []),
             {
@@ -274,9 +305,8 @@ const Chat = ({ chatOpened }: ChatProps) => {
 
         if (chat.chat.messageId) {
           // Actualizar el ID del mensaje cuando se termine de generar
-          /* console.log("generacion de tarea finalizada"); */
+
           if (generatedMessage) {
-            /* console.log("actualizacion de id"); */
             generatedMessage.id = chat.chat.messageId;
           }
           setMessage("");
@@ -284,11 +314,11 @@ const Chat = ({ chatOpened }: ChatProps) => {
           // Actualizar el mensaje mientras se va generando
           if (generatedMessage) {
             // Reemplazar mensaje si el item ya existe en array de mensajes
-            /* console.log("escribiendo tarea"); */
+
             generatedMessage.message = chat.chat.message;
           } else {
             // Crear item en array de mensajes en caso aun no exista
-            /* console.log("crear item con id:", "generatedMessage"); */
+
             setMessagesData(prevMessagesData => [
               ...(prevMessagesData ?? []),
               {
@@ -306,7 +336,7 @@ const Chat = ({ chatOpened }: ChatProps) => {
   }, [chat]);
 
   useEffect(() => {
-    viewport.current!.scrollTo({ top: viewport.current!.scrollHeight /* behavior: "smooth" */ });
+    scrollToBottom(viewport);
   }, [messagesData, isTyping, chat]);
 
   // Set chatId after created it
@@ -382,6 +412,7 @@ const Chat = ({ chatOpened }: ChatProps) => {
             isLoadingMessages={isLoadingMessages}
             isTyping={isTyping}
             messagesData={messagesData}
+            viewport={viewport}
           />
         ) : (
           <Group py={"100%"}>
