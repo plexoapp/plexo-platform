@@ -13,22 +13,32 @@ import {
   Loader,
   Textarea,
   Alert,
+  Tooltip,
 } from "@mantine/core";
 
 import PlexoUserImage from "components/resources/PlexoUserImage";
 import { usePlexoContext } from "context/PlexoContext";
 import { GetMessagesDocument, SendMessageDocument } from "integration/graphql";
 import { useEffect, useRef, useState } from "react";
-import { InfoCircle, Send } from "tabler-icons-react";
+import { Check, InfoCircle, Send } from "tabler-icons-react";
 import { useQuery, useSubscription } from "urql";
 import { v4 as uuidv4 } from "uuid";
 import { formateDate } from "./utils";
 import MessagesSkeleton from "./Skeleton";
 import { getHotkeyHandler } from "@mantine/hooks";
 import ChatProjectSelector from "./ProjectSelector";
+import { Member } from "lib/types";
+import { ManualLeadTaskSelector } from "../Task/lead";
+
+export type TaskChat = {
+  id: string;
+  title: string;
+  /* lead: Member | null; */
+};
 
 export type MessageProps = {
   id: string;
+  type: string;
   role: string;
   message: string;
   createdAt: string;
@@ -66,6 +76,70 @@ const Message = ({ message }: { message: MessageProps }) => {
   );
 };
 
+const TaskList = ({ message }: { message: MessageProps }) => {
+  const theme = useMantineTheme();
+  console.log(JSON.parse(message.message));
+  console.log(JSON.parse(message.message)?.input);
+  const messages = JSON.parse(message.message)?.input;
+  const [tasks, setTasks] = useState<TaskChat[]>([]);
+
+  useEffect(() => {
+    setTasks([
+      ...messages.map((item: any) => ({
+        id: uuidv4(),
+        title: item.title,
+        /* lead: item.assignee_id */
+      })),
+      ...tasks,
+    ]);
+  }, [messages]);
+
+  return (
+    <Stack spacing={"xs"}>
+      <Paper
+        key={message.id}
+        w={250}
+        p="sm"
+        sx={{
+          backgroundColor:
+            theme.colorScheme === "dark" ? theme.colors.brand[9] : theme.colors.green[1],
+          alignSelf: "flex-start",
+        }}
+      >
+        {tasks?.map((item, index) => {
+          return (
+            <Paper key={index} px={6} py={4} mt={1}>
+              <Group spacing={0}>
+                {/* <Tooltip label={statusLabel(task.status)} position="bottom">
+            <ManualStatusSelector task={task} tasks={tasks} setTasks={setTasks} />
+          </Tooltip> */}
+                {/* <Tooltip label={task.lead?.name ? task.lead?.name : "No assignee"} position="bottom">
+            <ManualLeadTaskSelector task={task} tasks={tasks} setTasks={setTasks} />
+          </Tooltip> */}
+
+                <Text size={"sm"} sx={{ flex: 1 }}>
+                  {item.title}
+                </Text>
+
+                <ActionIcon
+                  ml={4}
+                  size={"sm"}
+                  /* onClick={() => setTasks(tasks.filter(r => r.id !== task.id))} */
+                >
+                  <Check size={16} />
+                </ActionIcon>
+              </Group>
+            </Paper>
+          );
+        })}
+      </Paper>
+      <Text fz={"xs"} c={"dimmed"} align={"left"}>
+        {message.createdAt}
+      </Text>
+    </Stack>
+  );
+};
+
 type MessageListProps = {
   isLoadingMessages: boolean;
   isTyping: boolean;
@@ -85,6 +159,11 @@ const MessageList = ({ isLoadingMessages, isTyping, messagesData }: MessageListP
         messagesData.length ? (
           messagesData.map(item => {
             return <Message key={item.id} message={item} />;
+            /* return item.type === "text" ? (
+              <Message key={item.id} message={item} />
+            ) : (
+              <TaskList key={item.id} message={item} />
+            ); */
           })
         ) : (
           <Group py={"100%"}>
@@ -147,46 +226,88 @@ const Chat = ({ chatOpened }: ChatProps) => {
         ?.sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime())
         .map(item => {
           const contentObject = JSON.parse(item.content);
-          const { content, role } = contentObject;
+          const { content, role, tool_call_id, tool_calls } = contentObject;
 
           const date = new Date(item.createdAt);
           const formatDate = formateDate(date);
 
           return {
             id: item.id as string,
+            type: tool_call_id || tool_calls ? "tasks" : "text",
             role: role as string,
             message: content as string,
             createdAt: formatDate,
           };
-        });
+        })
+        .filter(item => item.type === "text"); // Mostrar solo los mensajes tipo texto
       setMessagesData(data);
     }
   }, [messages]);
 
   useEffect(() => {
     if (chat) {
-      if (chat.chat.messageId) {
-        setMessagesData(prevMessagesData => [
-          ...(prevMessagesData ?? []),
-          {
-            id: chat.chat.messageId,
-            role: "assistant",
-            message: chat.chat.message,
-            createdAt: formateDate(new Date()),
-          },
-        ]);
+      // Mensaje tipo tasks (tool calls)
+      if (chat.chat.toolCalls) {
+        if (chat.chat.messageId) {
+          /* console.log(JSON.parse(chat.chat.message)); */
+          setMessagesData(prevMessagesData => [
+            ...(prevMessagesData ?? []),
+            {
+              id: chat.chat.messageId,
+              type: "tasks",
+              role: "assistant",
+              message: chat.chat.message,
+              createdAt: formateDate(new Date()),
+            },
+          ]);
 
-        setIsTyping(false);
-        setMessage("");
+          // Reset values and stop typing
+          setMessage("");
+          setIsTyping(false);
+        }
       } else {
-        setIsTyping(true);
+        // Stop typing
+        setIsTyping(false);
+
+        // Mensajes tipo texto
+        const generatedMessage = messagesData?.find(message => message.id === "generatedMessage");
+
+        if (chat.chat.messageId) {
+          // Actualizar el ID del mensaje cuando se termine de generar
+          /* console.log("generacion de tarea finalizada"); */
+          if (generatedMessage) {
+            /* console.log("actualizacion de id"); */
+            generatedMessage.id = chat.chat.messageId;
+          }
+          setMessage("");
+        } else {
+          // Actualizar el mensaje mientras se va generando
+          if (generatedMessage) {
+            // Reemplazar mensaje si el item ya existe en array de mensajes
+            /* console.log("escribiendo tarea"); */
+            generatedMessage.message = chat.chat.message;
+          } else {
+            // Crear item en array de mensajes en caso aun no exista
+            /* console.log("crear item con id:", "generatedMessage"); */
+            setMessagesData(prevMessagesData => [
+              ...(prevMessagesData ?? []),
+              {
+                id: "generatedMessage",
+                type: "text",
+                role: "assistant",
+                message: chat.chat.message,
+                createdAt: formateDate(new Date()),
+              },
+            ]);
+          }
+        }
       }
     }
   }, [chat]);
 
   useEffect(() => {
-    viewport.current!.scrollTo({ top: viewport.current!.scrollHeight, behavior: "smooth" });
-  }, [messagesData, isTyping]);
+    viewport.current!.scrollTo({ top: viewport.current!.scrollHeight /* behavior: "smooth" */ });
+  }, [messagesData, isTyping, chat]);
 
   // Set chatId after created it
   useEffect(() => {
@@ -201,6 +322,7 @@ const Chat = ({ chatOpened }: ChatProps) => {
       ...(prevMessagesData ?? []),
       {
         id: uuidv4(),
+        type: "text",
         role: "user",
         message: message,
         createdAt: formateDate(new Date()),
@@ -210,6 +332,7 @@ const Chat = ({ chatOpened }: ChatProps) => {
     //Execute subscription
     if (message.trim() !== "") {
       handlerSubscription();
+      setIsTyping(true);
       setInputMessage("");
     }
   };
