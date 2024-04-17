@@ -19,7 +19,7 @@ import PlexoUserImage from "components/resources/PlexoUserImage";
 import { usePlexoContext } from "context/PlexoContext";
 import { GetMessagesDocument, SendMessageDocument } from "integration/graphql";
 import { RefObject, useEffect, useRef, useState } from "react";
-import { InfoCircle, Send, X } from "tabler-icons-react";
+import { InfoCircle, Send } from "tabler-icons-react";
 import { useQuery, useSubscription } from "urql";
 import { v4 as uuidv4 } from "uuid";
 import { formateDate } from "./utils";
@@ -132,33 +132,40 @@ const TaskList = ({
       <Paper
         key={message.id}
         w={"100%"}
-        p="sm"
+        p={8}
         sx={{
           backgroundColor:
             theme.colorScheme === "dark" ? theme.colors.brand[9] : theme.colors.green[1],
           alignSelf: "flex-start",
         }}
       >
-        {tasks?.map((task, index) => {
-          return (
-            <Paper key={index} px={6} py={4} mt={1}>
-              <Group spacing={0}>
-                {/* <Tooltip
+        <Stack spacing={"xs"}>
+          <Text fz={"sm"} color={theme.colorScheme === "dark" ? "white" : theme.colors.dark[6]}>
+            Create your tasks:
+          </Text>
+          <Stack spacing={0}>
+            {tasks?.map((task, index) => {
+              return (
+                <Paper key={index} px={6} py={4} mt={1}>
+                  <Group spacing={0}>
+                    {/* <Tooltip
                   label={task.lead?.name ? task.lead?.name : "No assignee"}
                   position="bottom"
                 >
                   <ManualLeadTaskSelector task={task} tasks={tasks} setTasks={setTasks} />
                 </Tooltip> */}
 
-                <Text size={"sm"} sx={{ flex: 1 }}>
-                  {task.title}
-                </Text>
+                    <Text size={"sm"} sx={{ flex: 1 }}>
+                      {task.title}
+                    </Text>
 
-                <ActionTaskButton task={task} tasks={tasks} setTasks={setTasks} />
-              </Group>
-            </Paper>
-          );
-        })}
+                    <ActionTaskButton task={task} tasks={tasks} setTasks={setTasks} />
+                  </Group>
+                </Paper>
+              );
+            })}
+          </Stack>
+        </Stack>
       </Paper>
       <Text fz={"xs"} c={"dimmed"} align={"left"}>
         {message.createdAt}
