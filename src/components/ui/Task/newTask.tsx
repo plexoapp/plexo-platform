@@ -67,6 +67,8 @@ const parseSubtasks = (subtasks: SubTask[]) => {
   });
 };
 
+const EditorWidget = dynamic(import("../Editor/index"), { ssr: false });
+
 const NewTask = ({ newTaskOpened, setNewTaskOpened, createMore, setCreateMore }: NewTaskProps) => {
   const { classes, theme } = useStyles();
   const [showSubtasks, toggleSubtasks] = useToggle([false, true]);
@@ -178,16 +180,16 @@ const NewTask = ({ newTaskOpened, setNewTaskOpened, createMore, setCreateMore }:
   };
 
   // Get editor data
-  /* editorInstance
-    ?.save()
-    .then(outputData => {
-      console.log("Article data: ", outputData);
-    })
-    .catch(error => {
-      console.log("Saving failed: ", error);
-    }); */
-
-  const EditorWidget = dynamic(import("../Editor/index"), { ssr: false });
+  useEffect(() => {
+    setTimeout(() => {
+      editorInstance
+        ?.save()
+        .then(outputData => {
+          setDescription(JSON.stringify(outputData));
+        })
+        .catch(error => console.log(error));
+    }, 100);
+  }, [editorInstance, data]);
 
   return (
     <Modal
@@ -236,22 +238,9 @@ const NewTask = ({ newTaskOpened, setNewTaskOpened, createMore, setCreateMore }:
             input: classes.input,
           }}
         />
-        <Textarea
-          autosize
-          placeholder="Add description..."
-          size="sm"
-          minRows={2}
-          value={description}
-          onChange={e => setDescription(e.target.value)}
-          classNames={{
-            input: classes.input,
-          }}
-        />
-
         <EditorWidget
-          data={data}
           onChange={setData}
-          setEditorInstance={setEditorInstance}
+          onEditorInstanceChange={setEditorInstance}
           editorblock="editorjs-container"
         />
         <Group spacing={6} mb={"md"}>

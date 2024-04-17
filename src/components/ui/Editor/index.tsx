@@ -1,40 +1,40 @@
 // @ts-nocheck
-import React, { memo, useEffect, useRef, useState } from "react";
+import React, { memo, useEffect, useRef } from "react";
 import EditorJS, { OutputData } from "@editorjs/editorjs";
 import { tools } from "./tools";
 
 type EditorProps = {
-  data: OutputData | undefined;
   onChange: (data: OutputData | undefined) => void;
-  setEditorInstance: (editorInstance: EditorJS | null) => void;
+  onEditorInstanceChange: (editorInstance: EditorJS | null) => void;
   editorblock: string;
 };
 
-const Editor = ({ data, onChange, setEditorInstance, editorblock }: EditorProps) => {
-  const ref = useRef();
+const Editor = ({ onChange, onEditorInstanceChange, editorblock }: EditorProps) => {
+  const EditorRef = useRef();
 
   //Initialize editorjs
   useEffect(() => {
     //Initialize editorjs if we don't have a reference
-    if (!ref.current) {
+    if (!EditorRef.current) {
       const editor = new EditorJS({
         holder: editorblock,
         placeholder: "Write something here...",
         tools: tools,
-        /*  data: data, */
         async onChange(api, event) {
           const data = await api.saver.save();
           console.log(data);
-          /* onChange(data); */
+          onChange(data);
         },
       });
-      ref.current = editor;
+      EditorRef.current = editor;
     }
+    onEditorInstanceChange(EditorRef.current);
 
     //Add a return function to handle cleanup
     return () => {
-      if (ref.current && ref.current.destroy) {
-        ref.current.destroy();
+      if (EditorRef.current && EditorRef.current.destroy) {
+        onEditorInstanceChange(null);
+        EditorRef.current.destroy();
       }
     };
   }, []);
