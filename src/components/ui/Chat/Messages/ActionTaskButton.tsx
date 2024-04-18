@@ -1,8 +1,8 @@
 import { ActionIcon } from "@mantine/core";
 import { useActions } from "lib/hooks/useActions";
-import { TaskChat } from ".";
 import { showNotification } from "@mantine/notifications";
 import { Check, X } from "tabler-icons-react";
+import { TaskChat } from "./TaskMessage";
 
 const ActionTaskButton = ({
   task,
@@ -19,6 +19,7 @@ const ActionTaskButton = ({
     const res = await fetchCreateTask({
       input: {
         title: value.title,
+        leadId: value.lead?.id,
       },
     });
 
