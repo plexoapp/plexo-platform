@@ -30,7 +30,7 @@ export type ProjectTask = {
 
 type ProjectTasksProps = {
   tasks: ProjectTask[];
-  setTasks: (subtasks: ProjectTask[]) => void;
+  setTasks: (tasks: ProjectTask[]) => void;
   name: string;
   description: string;
 };

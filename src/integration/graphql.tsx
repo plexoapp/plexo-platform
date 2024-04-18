@@ -92,11 +92,25 @@ export type ChatResponseChunk = {
   delta: Scalars["String"]["output"];
   message: Scalars["String"]["output"];
   messageId?: Maybe<Scalars["UUID"]["output"]>;
+  toolCalls?: Maybe<Array<ChatResponseToolCall>>;
+};
+
+export type ChatResponseFunctionCall = {
+  __typename?: "ChatResponseFunctionCall";
+  arguments?: Maybe<Scalars["String"]["output"]>;
+  name?: Maybe<Scalars["String"]["output"]>;
 };
 
 export type ChatResponseInput = {
   chatId: Scalars["UUID"]["input"];
   message: Scalars["String"]["input"];
+};
+
+export type ChatResponseToolCall = {
+  __typename?: "ChatResponseToolCall";
+  function?: Maybe<ChatResponseFunctionCall>;
+  id?: Maybe<Scalars["String"]["output"]>;
+  type?: Maybe<Scalars["String"]["output"]>;
 };
 
 export enum ChatStatus {
@@ -983,6 +997,16 @@ export type SendMessageSubscription = {
     delta: string;
     message: string;
     messageId?: any | null;
+    toolCalls?: Array<{
+      __typename?: "ChatResponseToolCall";
+      id?: string | null;
+      type?: string | null;
+      function?: {
+        __typename?: "ChatResponseFunctionCall";
+        name?: string | null;
+        arguments?: string | null;
+      } | null;
+    }> | null;
   };
 };
 
@@ -1623,6 +1647,28 @@ export const SendMessageDocument = {
                 { kind: "Field", name: { kind: "Name", value: "delta" } },
                 { kind: "Field", name: { kind: "Name", value: "message" } },
                 { kind: "Field", name: { kind: "Name", value: "messageId" } },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "toolCalls" },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      { kind: "Field", name: { kind: "Name", value: "id" } },
+                      { kind: "Field", name: { kind: "Name", value: "type" } },
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "function" },
+                        selectionSet: {
+                          kind: "SelectionSet",
+                          selections: [
+                            { kind: "Field", name: { kind: "Name", value: "name" } },
+                            { kind: "Field", name: { kind: "Name", value: "arguments" } },
+                          ],
+                        },
+                      },
+                    ],
+                  },
+                },
               ],
             },
           },
