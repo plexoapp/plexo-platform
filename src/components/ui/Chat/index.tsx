@@ -18,61 +18,30 @@ import {
 import PlexoUserImage from "components/resources/PlexoUserImage";
 import { usePlexoContext } from "context/PlexoContext";
 import { GetMessagesDocument, SendMessageDocument } from "integration/graphql";
-import { useEffect, useRef, useState } from "react";
+import { RefObject, useEffect, useRef, useState } from "react";
 import { InfoCircle, Send } from "tabler-icons-react";
 import { useQuery, useSubscription } from "urql";
 import { v4 as uuidv4 } from "uuid";
-import { formateDate } from "./utils";
+import { formateDate, scrollToBottom } from "./utils";
 import MessagesSkeleton from "./Skeleton";
 import { getHotkeyHandler } from "@mantine/hooks";
 import ChatProjectSelector from "./ProjectSelector";
 
-export type MessageProps = {
-  id: string;
-  role: string;
-  message: string;
-  createdAt: string;
-};
+import TextMessage, { TextMessageProps } from "./Messages/TextMessage";
+import TaskMessage from "./Messages/TaskMessage";
 
 type ChatProps = {
   chatOpened: boolean;
 };
 
-const Message = ({ message }: { message: MessageProps }) => {
-  const theme = useMantineTheme();
-  const assistantDarkBg =
-    theme.colorScheme === "dark" ? theme.colors.brand[9] : theme.colors.green[1];
-  const userLightBg = theme.colorScheme === "dark" ? theme.colors.dark[5] : theme.colors.gray[3];
-
-  return (
-    <Stack spacing={"xs"}>
-      <Paper
-        key={message.id}
-        w={250}
-        p="sm"
-        sx={{
-          backgroundColor: message.role == "assistant" ? assistantDarkBg : userLightBg,
-          alignSelf: `${message.role == "assistant" ? "flex-start" : "flex-end"}`,
-        }}
-      >
-        <Text fz={"sm"} color={theme.colorScheme === "dark" ? "white" : theme.colors.dark[6]}>
-          {message.message}
-        </Text>
-      </Paper>
-      <Text fz={"xs"} c={"dimmed"} align={message.role == "assistant" ? "left" : "right"}>
-        {message.createdAt}
-      </Text>
-    </Stack>
-  );
-};
-
 type MessageListProps = {
   isLoadingMessages: boolean;
   isTyping: boolean;
-  messagesData: MessageProps[] | null;
+  messagesData: TextMessageProps[] | null;
+  viewport: RefObject<HTMLDivElement>;
 };
 
-const MessageList = ({ isLoadingMessages, isTyping, messagesData }: MessageListProps) => {
+const MessageList = ({ isLoadingMessages, isTyping, messagesData, viewport }: MessageListProps) => {
   const theme = useMantineTheme();
   const assistantDarkBg =
     theme.colorScheme === "dark" ? theme.colors.brand[9] : theme.colors.green[1];
@@ -84,7 +53,11 @@ const MessageList = ({ isLoadingMessages, isTyping, messagesData }: MessageListP
       {messagesData ? (
         messagesData.length ? (
           messagesData.map(item => {
-            return <Message key={item.id} message={item} />;
+            return item.type === "text" ? (
+              <TextMessage key={item.id} message={item} />
+            ) : (
+              <TaskMessage key={item.id} message={item} viewport={viewport} />
+            );
           })
         ) : (
           <Group py={"100%"}>
@@ -118,7 +91,7 @@ const Chat = ({ chatOpened }: ChatProps) => {
   const [inputMessage, setInputMessage] = useState("");
   const [message, setMessage] = useState("");
   const [chatId, setChatId] = useState<string | null>(null);
-  const [messagesData, setMessagesData] = useState<MessageProps[] | null>(null);
+  const [messagesData, setMessagesData] = useState<TextMessageProps[] | null>(null);
   const [selectedProject, setSelectedProject] = useState<string | null>(null);
   const [isTyping, setIsTyping] = useState(false);
 
@@ -147,46 +120,86 @@ const Chat = ({ chatOpened }: ChatProps) => {
         ?.sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime())
         .map(item => {
           const contentObject = JSON.parse(item.content);
-          const { content, role } = contentObject;
+          const { content, role, tool_call_id, tool_calls } = contentObject;
 
           const date = new Date(item.createdAt);
           const formatDate = formateDate(date);
 
           return {
             id: item.id as string,
+            type: tool_call_id || tool_calls ? "tasks" : "text",
             role: role as string,
             message: content as string,
             createdAt: formatDate,
           };
-        });
+        })
+        .filter(item => item.type === "text"); // Mostrar solo los mensajes tipo texto
       setMessagesData(data);
     }
   }, [messages]);
 
   useEffect(() => {
     if (chat) {
-      if (chat.chat.messageId) {
-        setMessagesData(prevMessagesData => [
-          ...(prevMessagesData ?? []),
-          {
-            id: chat.chat.messageId,
-            role: "assistant",
-            message: chat.chat.message,
-            createdAt: formateDate(new Date()),
-          },
-        ]);
+      // Mensaje tipo tasks (tool calls)
+      if (chat.chat.toolCalls) {
+        if (chat.chat.messageId) {
+          setMessagesData(prevMessagesData => [
+            ...(prevMessagesData ?? []),
+            {
+              id: chat.chat.messageId,
+              type: "tasks",
+              role: "assistant",
+              message: chat.chat.message,
+              createdAt: formateDate(new Date()),
+            },
+          ]);
 
-        setIsTyping(false);
-        setMessage("");
+          // Reset values and stop typing
+          setMessage("");
+          setIsTyping(false);
+        }
       } else {
-        setIsTyping(true);
+        // Stop typing
+        setIsTyping(false);
+
+        // Mensajes tipo texto
+        const generatedMessage = messagesData?.find(message => message.id === "generatedMessage");
+
+        if (chat.chat.messageId) {
+          // Actualizar el ID del mensaje cuando se termine de generar
+
+          if (generatedMessage) {
+            generatedMessage.id = chat.chat.messageId;
+          }
+          setMessage("");
+        } else {
+          // Actualizar el mensaje mientras se va generando
+          if (generatedMessage) {
+            // Reemplazar mensaje si el item ya existe en array de mensajes
+
+            generatedMessage.message = chat.chat.message;
+          } else {
+            // Crear item en array de mensajes en caso aun no exista
+
+            setMessagesData(prevMessagesData => [
+              ...(prevMessagesData ?? []),
+              {
+                id: "generatedMessage",
+                type: "text",
+                role: "assistant",
+                message: chat.chat.message,
+                createdAt: formateDate(new Date()),
+              },
+            ]);
+          }
+        }
       }
     }
   }, [chat]);
 
   useEffect(() => {
-    viewport.current!.scrollTo({ top: viewport.current!.scrollHeight, behavior: "smooth" });
-  }, [messagesData, isTyping]);
+    scrollToBottom(viewport);
+  }, [messagesData, isTyping, chat]);
 
   // Set chatId after created it
   useEffect(() => {
@@ -201,6 +214,7 @@ const Chat = ({ chatOpened }: ChatProps) => {
       ...(prevMessagesData ?? []),
       {
         id: uuidv4(),
+        type: "text",
         role: "user",
         message: message,
         createdAt: formateDate(new Date()),
@@ -210,6 +224,7 @@ const Chat = ({ chatOpened }: ChatProps) => {
     //Execute subscription
     if (message.trim() !== "") {
       handlerSubscription();
+      setIsTyping(true);
       setInputMessage("");
     }
   };
@@ -259,6 +274,7 @@ const Chat = ({ chatOpened }: ChatProps) => {
             isLoadingMessages={isLoadingMessages}
             isTyping={isTyping}
             messagesData={messagesData}
+            viewport={viewport}
           />
         ) : (
           <Group py={"100%"}>

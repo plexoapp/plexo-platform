@@ -3,6 +3,14 @@ subscription SendMessage($chatId: UUID!, $message: String!) {
     delta
     message
     messageId
+    toolCalls {
+      id
+      type
+      function {
+        name
+        arguments
+      }
+    }
   }
 }
 

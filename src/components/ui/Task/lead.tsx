@@ -21,6 +21,7 @@ import { noMemberId } from "../constant";
 import { MemberPhoto } from "../MemberPhoto";
 import { usePlexoContext } from "context/PlexoContext";
 import { ProjectTask } from "../Project/DesignProject/projectTasks";
+import { TaskChat } from "../Chat/Messages/TaskMessage";
 
 type GenericLeadMenuProps = {
   children: React.ReactNode;
@@ -126,14 +127,21 @@ export const GenericLeadTaskMenu = ({
   );
 };
 
-type ManualLeadMenuProps = {
+type ManualLeadMenuProps<T extends Payload> = {
   children: React.ReactNode;
-  task: ProjectTask;
-  tasks: ProjectTask[];
-  setTasks: (subtasks: ProjectTask[]) => void;
+  task: T;
+  tasks: T[];
+  setTasks: SetTasksFunction<T>;
+  suggestedLeadId?: string | null;
 };
 
-export const ManualLeadTaskMenu = ({ children, task, tasks, setTasks }: ManualLeadMenuProps) => {
+export const ManualLeadTaskMenu = <T extends Payload>({
+  children,
+  task,
+  tasks,
+  setTasks,
+  suggestedLeadId,
+}: ManualLeadMenuProps<T>) => {
   const { membersData, isLoadingMembers } = usePlexoContext();
 
   const [searchValue, setSearchValue] = useState("");
@@ -156,6 +164,20 @@ export const ManualLeadTaskMenu = ({ children, task, tasks, setTasks }: ManualLe
     });
     setTasks(updatedTasks);
   };
+
+  useEffect(() => {
+    if (suggestedLeadId) {
+      let objeto = tasks.find(obj => obj.id === task.id);
+      const leadSug = membersOptions.filter(member => member.id == suggestedLeadId)[0];
+      if (objeto) {
+        objeto.lead = leadSug ? leadSug : null;
+      }
+
+      // Actualizar lista de tareas
+      const updatedTasks = tasks.map(item => item);
+      setTasks([...updatedTasks]);
+    }
+  }, [membersOptions]);
 
   return (
     <Menu
@@ -204,15 +226,30 @@ export const ManualLeadTaskMenu = ({ children, task, tasks, setTasks }: ManualLe
   );
 };
 
-type ManualLeadTaskSelectorProps = {
-  task: ProjectTask;
-  tasks: ProjectTask[];
-  setTasks: (subtasks: ProjectTask[]) => void;
+type SetTasksFunction<T extends Payload> = (tasks: T[]) => void;
+
+type Payload = ProjectTask | TaskChat;
+
+type ManualLeadTaskSelectorProps<T extends Payload> = {
+  task: T;
+  tasks: T[];
+  setTasks: SetTasksFunction<T>;
+  suggestedLeadId?: string | null;
 };
 
-export const ManualLeadTaskSelector = ({ task, tasks, setTasks }: ManualLeadTaskSelectorProps) => {
+export const ManualLeadTaskSelector = <T extends Payload>({
+  task,
+  tasks,
+  setTasks,
+  suggestedLeadId,
+}: ManualLeadTaskSelectorProps<T>) => {
   return (
-    <ManualLeadTaskMenu task={task} tasks={tasks} setTasks={setTasks}>
+    <ManualLeadTaskMenu
+      task={task}
+      tasks={tasks}
+      setTasks={setTasks}
+      suggestedLeadId={suggestedLeadId}
+    >
       <ActionIcon variant="transparent">{MemberPhoto(task.lead)}</ActionIcon>
     </ManualLeadTaskMenu>
   );
