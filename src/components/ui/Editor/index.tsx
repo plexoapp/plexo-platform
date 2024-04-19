@@ -6,7 +6,7 @@ import { tools } from "./tools";
 type EditorProps = {
   onChange: (data: OutputData | undefined) => void;
   onEditorInstanceChange: (editorInstance: EditorJS | null) => void;
-  editorblock: string;
+  editorblock: string; //Id único del editor
 };
 
 const Editor = ({ onChange, onEditorInstanceChange, editorblock }: EditorProps) => {
@@ -20,6 +20,7 @@ const Editor = ({ onChange, onEditorInstanceChange, editorblock }: EditorProps) 
         holder: editorblock,
         placeholder: "Write something here...",
         tools: tools,
+
         async onChange(api, event) {
           const data = await api.saver.save();
           console.log(data);

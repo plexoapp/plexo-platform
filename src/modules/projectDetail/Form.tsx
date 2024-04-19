@@ -1,10 +1,12 @@
 import { Button, Group, Skeleton, Stack, Textarea } from "@mantine/core";
 import { useForm } from "@mantine/form";
+import EditorJS, { OutputData } from "@editorjs/editorjs";
 
 import { useActions } from "lib/hooks/useActions";
 import { ErrorNotification, SuccessNotification } from "lib/notifications";
 import { ProjectById } from "lib/types";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import { EditorInput } from "components/ui/Editor/EditorInput";
 
 type TitleFormProps = {
   project: ProjectById | undefined;
@@ -17,6 +19,8 @@ const validateDescription = (description: string | null | undefined) => {
 
 export const TitleForm = ({ project, isLoading }: TitleFormProps) => {
   const { updateProject, fetchUpdateProject } = useActions();
+  const [data, setData] = useState<OutputData | undefined>(undefined);
+  const [editorInstance, setEditorInstance] = useState<EditorJS | null>(null);
 
   const form = useForm({
     initialValues: {
@@ -59,6 +63,19 @@ export const TitleForm = ({ project, isLoading }: TitleFormProps) => {
       ? false
       : true;
 
+  // Get editor data
+  useEffect(() => {
+    setTimeout(() => {
+      editorInstance
+        ?.save()
+        .then(outputData => {
+          console.log(JSON.stringify(outputData));
+          /* setDescription(JSON.stringify(outputData)); */
+        })
+        .catch(error => console.log(error));
+    }, 100);
+  }, [editorInstance, data]);
+
   return isLoading ? (
     <Stack>
       <Skeleton height={50} />
@@ -71,19 +88,21 @@ export const TitleForm = ({ project, isLoading }: TitleFormProps) => {
           autosize
           size="lg"
           minRows={1}
-          variant="filled"
           placeholder="Project Name"
           styles={theme => ({
             input: {
               fontSize: 22,
-              backgroundColor:
-                theme.colorScheme === "dark" ? theme.colors.dark[7] : theme.colors.gray[1],
             },
           })}
           {...form.getInputProps("name")}
         />
+        <EditorInput
+          setData={setData}
+          setEditorInstance={setEditorInstance}
+          editorBlock="editorjs-project"
+        />
 
-        <Textarea
+        {/*  <Textarea
           autosize
           size="sm"
           placeholder="Add description..."
@@ -96,7 +115,8 @@ export const TitleForm = ({ project, isLoading }: TitleFormProps) => {
             },
           })}
           {...form.getInputProps("description")}
-        />
+        /> */}
+
         <Group position="right">
           <Button
             compact

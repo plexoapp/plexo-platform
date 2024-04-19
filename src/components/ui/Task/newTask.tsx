@@ -8,9 +8,9 @@ import {
   Popover,
   Tooltip,
   ActionIcon,
-  createStyles,
   Stack,
   Collapse,
+  useMantineTheme,
 } from "@mantine/core";
 import { DatePicker } from "@mantine/dates";
 import { useToggle } from "@mantine/hooks";
@@ -32,7 +32,7 @@ import { priorityName, PrioritySelector } from "./priority";
 import { TaskStatus, TaskPriority, SuggestNewTaskDocument } from "integration/graphql";
 import NewSubTasks from "./newSubtasks";
 import { usePlexoContext } from "context/PlexoContext";
-import dynamic from "next/dynamic";
+import { EditorInput } from "../Editor/EditorInput";
 
 type NewTaskProps = {
   newTaskOpened: boolean;
@@ -47,16 +47,6 @@ export type SubTask = {
   lead: Member | null;
 };
 
-const useStyles = createStyles(theme => ({
-  input: {
-    backgroundColor: "transparent",
-    borderColor: "transparent",
-    "&:focus-within": {
-      borderColor: theme.colors.brand[6],
-    },
-  },
-}));
-
 const parseSubtasks = (subtasks: SubTask[]) => {
   return subtasks.map(task => {
     return {
@@ -67,10 +57,8 @@ const parseSubtasks = (subtasks: SubTask[]) => {
   });
 };
 
-const EditorWidget = dynamic(import("../Editor/index"), { ssr: false });
-
 const NewTask = ({ newTaskOpened, setNewTaskOpened, createMore, setCreateMore }: NewTaskProps) => {
-  const { classes, theme } = useStyles();
+  const theme = useMantineTheme();
   const [showSubtasks, toggleSubtasks] = useToggle([false, true]);
   const { createTask, fetchCreateTask } = useActions();
   const { taskId, setTaskId } = usePlexoContext();
@@ -228,20 +216,17 @@ const NewTask = ({ newTaskOpened, setNewTaskOpened, createMore, setCreateMore }:
       <Stack spacing={10}>
         <Textarea
           autosize
-          data-autofocus
+          autoFocus
           size="md"
           minRows={1}
           placeholder="Task Title"
           value={title}
           onChange={e => setTitle(e.target.value)}
-          classNames={{
-            input: classes.input,
-          }}
         />
-        <EditorWidget
-          onChange={setData}
-          onEditorInstanceChange={setEditorInstance}
-          editorblock="editorjs-container"
+        <EditorInput
+          setData={setData}
+          setEditorInstance={setEditorInstance}
+          editorBlock="editorjs-newtask"
         />
         <Group spacing={6} mb={"md"}>
           <StatusSelector status={status} setStatus={setStatus} type="button" />

@@ -1,10 +1,12 @@
 import { Button, Group, Skeleton, Stack, Textarea } from "@mantine/core";
 import { useForm } from "@mantine/form";
+import EditorJS, { OutputData } from "@editorjs/editorjs";
 
+import { EditorInput } from "components/ui/Editor/EditorInput";
 import { useActions } from "lib/hooks/useActions";
 import { ErrorNotification, SuccessNotification } from "lib/notifications";
 import { TaskById } from "lib/types";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 type TitleFormProps = {
   task: TaskById | undefined;
@@ -17,6 +19,8 @@ const validateDescription = (description: string | null | undefined) => {
 
 export const TitleForm = ({ task, isLoading }: TitleFormProps) => {
   const { updateTask, fetchUpdateTask } = useActions();
+  const [data, setData] = useState<OutputData | undefined>(undefined);
+  const [editorInstance, setEditorInstance] = useState<EditorJS | null>(null);
 
   const form = useForm({
     initialValues: {
@@ -59,6 +63,19 @@ export const TitleForm = ({ task, isLoading }: TitleFormProps) => {
       ? false
       : true;
 
+  // Get editor data
+  useEffect(() => {
+    setTimeout(() => {
+      editorInstance
+        ?.save()
+        .then(outputData => {
+          console.log(JSON.stringify(outputData));
+          /* setDescription(JSON.stringify(outputData)); */
+        })
+        .catch(error => console.log(error));
+    }, 100);
+  }, [editorInstance, data]);
+
   return isLoading ? (
     <Stack>
       <Skeleton height={50} />
@@ -71,19 +88,21 @@ export const TitleForm = ({ task, isLoading }: TitleFormProps) => {
           autosize
           size="lg"
           minRows={1}
-          variant="filled"
           placeholder="Task Title"
           styles={theme => ({
             input: {
               fontSize: 22,
-              backgroundColor:
-                theme.colorScheme === "dark" ? theme.colors.dark[7] : theme.colors.gray[1],
             },
           })}
           {...form.getInputProps("title")}
         />
+        <EditorInput
+          setData={setData}
+          setEditorInstance={setEditorInstance}
+          editorBlock="editorjs-task"
+        />
 
-        <Textarea
+        {/* <Textarea
           autosize
           size="sm"
           placeholder="Add description..."
@@ -96,7 +115,7 @@ export const TitleForm = ({ task, isLoading }: TitleFormProps) => {
             },
           })}
           {...form.getInputProps("description")}
-        />
+        /> */}
         <Group position="right">
           <Button compact type="submit" disabled={enableSaveButton} loading={updateTask.fetching}>
             Save
