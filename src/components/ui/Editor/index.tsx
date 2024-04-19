@@ -2,6 +2,7 @@
 import React, { memo, useEffect, useRef } from "react";
 import EditorJS, { OutputData } from "@editorjs/editorjs";
 import { tools } from "./tools";
+import { Box, useMantineTheme } from "@mantine/core";
 
 type EditorProps = {
   onChange: (data: OutputData | undefined) => void;
@@ -10,6 +11,7 @@ type EditorProps = {
 };
 
 const Editor = ({ onChange, onEditorInstanceChange, editorblock }: EditorProps) => {
+  const theme = useMantineTheme();
   const EditorRef = useRef();
 
   //Initialize editorjs
@@ -40,7 +42,18 @@ const Editor = ({ onChange, onEditorInstanceChange, editorblock }: EditorProps) 
     };
   }, []);
 
-  return <div id={editorblock} />;
+  return (
+    <Box
+      id={editorblock}
+      className={theme.colorScheme === "dark" ? "dark-mode" : ""}
+      pl={48}
+      sx={{
+        "@media (max-width: 650px)": {
+          paddingLeft: 0,
+        },
+      }}
+    />
+  );
 };
 
 export default memo(Editor);
