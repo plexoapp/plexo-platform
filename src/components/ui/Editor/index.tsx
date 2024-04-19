@@ -8,11 +8,12 @@ type EditorProps = {
   onChange: (data: OutputData | undefined) => void;
   onEditorInstanceChange: (editorInstance: EditorJS | null) => void;
   editorblock: string; //Id único del editor
+  data?: OutputData;
 };
 
-const Editor = ({ onChange, onEditorInstanceChange, editorblock }: EditorProps) => {
+const Editor = ({ onChange, onEditorInstanceChange, editorblock, data }: EditorProps) => {
   const theme = useMantineTheme();
-  const EditorRef = useRef();
+  const EditorRef = useRef<OutputData | undefined>(undefined);
 
   //Initialize editorjs
   useEffect(() => {
@@ -22,16 +23,18 @@ const Editor = ({ onChange, onEditorInstanceChange, editorblock }: EditorProps) 
         holder: editorblock,
         placeholder: "Write something here...",
         tools: tools,
-
+        data: data || undefined,
         async onChange(api, event) {
-          const data = await api.saver.save();
-          console.log(data);
-          onChange(data);
+          const changeData = await api.saver.save();
+          onChange(changeData);
+        },
+        onReady: () => {
+          onEditorInstanceChange(editor);
         },
       });
+
       EditorRef.current = editor;
     }
-    onEditorInstanceChange(EditorRef.current);
 
     //Add a return function to handle cleanup
     return () => {

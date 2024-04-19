@@ -20,6 +20,7 @@ const validateDescription = (description: string | null | undefined) => {
 export const TitleForm = ({ task, isLoading }: TitleFormProps) => {
   const { updateTask, fetchUpdateTask } = useActions();
   const [data, setData] = useState<OutputData | undefined>(undefined);
+  const [dataEditor, setDataEditor] = useState<OutputData | undefined>(undefined);
   const [editorInstance, setEditorInstance] = useState<EditorJS | null>(null);
 
   const form = useForm({
@@ -52,6 +53,7 @@ export const TitleForm = ({ task, isLoading }: TitleFormProps) => {
 
   useEffect(() => {
     if (task) {
+      setDataEditor(task.description ? JSON.parse(task.description) : undefined);
       form.setValues({ title: task.title, description: validateDescription(task.description) });
     }
   }, [task]);
@@ -75,6 +77,14 @@ export const TitleForm = ({ task, isLoading }: TitleFormProps) => {
         .catch(error => console.log(error));
     }, 100);
   }, [editorInstance, data]);
+
+  useEffect(() => {
+    if (dataEditor) {
+      setTimeout(() => {
+        editorInstance?.render(dataEditor);
+      }, 100);
+    }
+  }, [dataEditor]);
 
   return isLoading ? (
     <Stack>
@@ -100,6 +110,7 @@ export const TitleForm = ({ task, isLoading }: TitleFormProps) => {
           setData={setData}
           setEditorInstance={setEditorInstance}
           editorBlock="editorjs-task"
+          data={dataEditor}
         />
 
         {/* <Textarea
