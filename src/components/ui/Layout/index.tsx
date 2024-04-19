@@ -1,10 +1,18 @@
 import {
   ActionIcon,
   AppShell,
+  Aside,
+  Box,
+  Burger,
+  CloseButton,
   createStyles,
   Drawer,
+  Footer,
   Group,
+  Header,
   MediaQuery,
+  Navbar,
+  ScrollArea,
   Stack,
   Text,
   Tooltip,
@@ -61,6 +69,9 @@ const Layout = ({ pageTitle, button, children }: LayoutProps) => {
       setNewTaskOpened(true);
     }
   }, [newTaskOpened, createMoreTasks]);
+
+  const [opened, setOpened] = useState(false);
+  const [openedAside, setOpenedAside] = useState(false);
 
   return (
     <>
@@ -119,6 +130,119 @@ const Layout = ({ pageTitle, button, children }: LayoutProps) => {
       </Drawer>
 
       <AppShell
+        styles={{
+          main: {
+            /* paddingLeft:0, */
+            background: theme.colorScheme === "dark" ? theme.colors.dark[8] : theme.colors.gray[0],
+          },
+        }}
+        layout="alt"
+        navbarOffsetBreakpoint="md"
+        asideOffsetBreakpoint="md"
+        navbar={
+          <Navbar p="md" hiddenBreakpoint="md" hidden={!opened} width={{ md: 350, lg: 350 }}>
+            <Navbar.Section mt="xs">
+              <Text>Application navbar</Text>
+              <MediaQuery largerThan="md" styles={{ display: "none" }}>
+                <CloseButton aria-label="Close modal" onClick={() => setOpened(o => !o)} />
+              </MediaQuery>
+            </Navbar.Section>
+            <Navbar.Section grow component={ScrollArea} mx="-xs" px="xs">
+              <Box py={80}>
+                <Text>Application sidebar</Text>
+              </Box>
+              <Box py={80}>
+                <Text>Application sidebar</Text>
+              </Box>
+              <Box py={80}>
+                <Text>Application sidebar</Text>
+              </Box>
+              <Box py={80}>
+                <Text>Application sidebar</Text>
+              </Box>
+              <Box py={80}>
+                <Text>Application sidebar</Text>
+              </Box>
+              <Box py={80}>
+                <Text>Application sidebar</Text>
+              </Box>
+            </Navbar.Section>
+
+            <Navbar.Section>
+              <Text>Application sidebar</Text>
+            </Navbar.Section>
+          </Navbar>
+        }
+        aside={
+          <Aside p="md" hiddenBreakpoint="md" hidden={!openedAside} width={{ md: 300, lg: 300 }}>
+            <Aside.Section mt="xs">
+              <Text>Application sidebar</Text>
+              <MediaQuery largerThan="md" styles={{ display: "none" }}>
+                <CloseButton aria-label="Close modal" onClick={() => setOpenedAside(o => !o)} />
+              </MediaQuery>
+            </Aside.Section>
+
+            <Aside.Section grow component={ScrollArea} mx="-xs" px="xs">
+              <Box py={80}>
+                <Text>Application sidebar</Text>
+              </Box>
+              <Box py={80}>
+                <Text>Application sidebar</Text>
+              </Box>
+              <Box py={80}>
+                <Text>Application sidebar</Text>
+              </Box>
+              <Box py={80}>
+                <Text>Application sidebar</Text>
+              </Box>
+              <Box py={80}>
+                <Text>Application sidebar</Text>
+              </Box>
+              <Box py={80}>
+                <Text>Application sidebar</Text>
+              </Box>
+            </Aside.Section>
+
+            <Aside.Section>
+              <Text>Application sidebar</Text>
+            </Aside.Section>
+          </Aside>
+        }
+        /* footer={
+          <Footer height={60} p="md">
+            Application footer
+          </Footer>
+        } */
+        header={
+          <Header height={{ base: 50, md: 70 }} p="md">
+            <div style={{ display: "flex", alignItems: "center", height: "100%" }}>
+              <MediaQuery largerThan="md" styles={{ display: "none" }}>
+                <Burger
+                  opened={opened}
+                  onClick={() => setOpened(o => !o)}
+                  size="sm"
+                  color={theme.colors.gray[6]}
+                  mr="xl"
+                />
+              </MediaQuery>
+              <Text>Application header</Text>
+              <MediaQuery largerThan="md" styles={{ display: "none" }}>
+                <Burger
+                  opened={openedAside}
+                  onClick={() => setOpenedAside(o => !o)}
+                  size="sm"
+                  color={theme.colors.gray[6]}
+                  mr="xl"
+                />
+              </MediaQuery>
+            </div>
+          </Header>
+        }
+      >
+        {children}
+      </AppShell>
+
+      {/* <AppShell
         fixed
         padding={0}
         navbarOffsetBreakpoint="md"
@@ -184,7 +308,7 @@ const Layout = ({ pageTitle, button, children }: LayoutProps) => {
           </Group>
           {children}
         </Stack>
-      </AppShell>
+      </AppShell> */}
     </>
   );
 };

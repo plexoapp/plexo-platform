@@ -311,7 +311,7 @@ const TasksList = ({ taskData, fetching }: TasksProps) => {
   };
 
   return (
-    <ScrollArea type="hover" offsetScrollbars h={"calc(100vh - 130px)"} style={{ flexGrow: 1 }}>
+    <ScrollArea type="hover" offsetScrollbars h={"calc(100vh - 159px)"} style={{ flexGrow: 1 }}>
       <Container p={"md"}>
         <Counter status={TaskStatus.None} fetching={fetching} />
         {fetching ? <Skeleton height={36} radius="sm" /> : <TaskList status={TaskStatus.None} />}
