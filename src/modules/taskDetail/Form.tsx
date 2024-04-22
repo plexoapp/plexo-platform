@@ -109,7 +109,7 @@ export const TitleForm = ({ task, isLoading }: TitleFormProps) => {
         <EditorInput
           setData={setData}
           setEditorInstance={setEditorInstance}
-          editorBlock="editorjs-task"
+          editorId="editorjs-task"
           data={dataEditor}
         />
 

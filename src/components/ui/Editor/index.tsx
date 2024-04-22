@@ -1,32 +1,32 @@
 // @ts-nocheck
-import React, { memo, useEffect, useRef } from "react";
 import EditorJS, { OutputData } from "@editorjs/editorjs";
-import { tools } from "./tools";
 import { Box, useMantineTheme } from "@mantine/core";
+import React, { memo, useEffect, useRef } from "react";
+import { tools } from "./tools";
 
 type EditorProps = {
-  onChange: (data: OutputData | undefined) => void;
+  onChangeData: (data: OutputData | undefined) => void;
   onEditorInstanceChange: (editorInstance: EditorJS | null) => void;
-  editorblock: string; //Id único del editor
+  editorId: string; //Id único del editor
   data?: OutputData;
 };
 
-const Editor = ({ onChange, onEditorInstanceChange, editorblock, data }: EditorProps) => {
+const Editor = ({ onChangeData, onEditorInstanceChange, editorId, data }: EditorProps) => {
   const theme = useMantineTheme();
-  const EditorRef = useRef<OutputData | undefined>(undefined);
+  const EditorRef = useRef<EditorJS | null>(null);
 
   //Initialize editorjs
   useEffect(() => {
     //Initialize editorjs if we don't have a reference
     if (!EditorRef.current) {
       const editor = new EditorJS({
-        holder: editorblock,
+        holder: editorId,
         placeholder: "Write something here...",
         tools: tools,
         data: data || undefined,
         async onChange(api, event) {
           const changeData = await api.saver.save();
-          onChange(changeData);
+          onChangeData(changeData);
         },
         onReady: () => {
           onEditorInstanceChange(editor);
@@ -47,7 +47,7 @@ const Editor = ({ onChange, onEditorInstanceChange, editorblock, data }: EditorP
 
   return (
     <Box
-      id={editorblock}
+      id={editorId}
       className={theme.colorScheme === "dark" ? "dark-mode" : ""}
       pl={48}
       sx={{

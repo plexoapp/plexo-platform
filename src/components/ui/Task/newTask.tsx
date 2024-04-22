@@ -226,7 +226,7 @@ const NewTask = ({ newTaskOpened, setNewTaskOpened, createMore, setCreateMore }:
         <EditorInput
           setData={setData}
           setEditorInstance={setEditorInstance}
-          editorBlock="editorjs-newtask"
+          editorId="editorjs-newtask"
         />
         <Group spacing={6} mb={"md"}>
           <StatusSelector status={status} setStatus={setStatus} type="button" />

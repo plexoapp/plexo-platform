@@ -5,18 +5,13 @@ import EditorJS, { OutputData } from "@editorjs/editorjs";
 type EditorInputProps = {
   setData: (data: OutputData | undefined) => void;
   setEditorInstance: (editorInstance: EditorJS | null) => void;
-  editorBlock: string;
+  editorId: string;
   data?: OutputData | undefined;
 };
 
 const Editor = dynamic(import("./index"), { ssr: false });
 
-export const EditorInput = ({
-  setData,
-  setEditorInstance,
-  editorBlock,
-  data,
-}: EditorInputProps) => {
+export const EditorInput = ({ setData, setEditorInstance, editorId, data }: EditorInputProps) => {
   const theme = useMantineTheme();
 
   return (
@@ -33,9 +28,9 @@ export const EditorInput = ({
       }}
     >
       <Editor
-        onChange={setData}
+        onChangeData={setData}
         onEditorInstanceChange={setEditorInstance}
-        editorblock={editorBlock}
+        editorId={editorId}
         data={data}
       />
     </Paper>

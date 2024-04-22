@@ -99,7 +99,7 @@ export const TitleForm = ({ project, isLoading }: TitleFormProps) => {
         <EditorInput
           setData={setData}
           setEditorInstance={setEditorInstance}
-          editorBlock="editorjs-project"
+          editorId="editorjs-project"
         />
 
         {/*  <Textarea
