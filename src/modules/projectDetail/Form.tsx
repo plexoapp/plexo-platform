@@ -1,22 +1,28 @@
 import { Button, Group, Skeleton, Stack, Textarea } from "@mantine/core";
 import { useForm } from "@mantine/form";
+import EditorJS, { OutputData } from "@editorjs/editorjs";
 
 import { useActions } from "lib/hooks/useActions";
 import { ErrorNotification, SuccessNotification } from "lib/notifications";
 import { ProjectById } from "lib/types";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import { EditorInput } from "components/ui/Editor/EditorInput";
+import { parseJsonDesc } from "lib/utils";
 
 type TitleFormProps = {
   project: ProjectById | undefined;
   isLoading: boolean;
 };
 
-const validateDescription = (description: string | null | undefined) => {
-  return description ? description : "";
+const validateDescription = (description: OutputData | undefined) => {
+  return description ? JSON.stringify(description) : "";
 };
 
 export const TitleForm = ({ project, isLoading }: TitleFormProps) => {
   const { updateProject, fetchUpdateProject } = useActions();
+  const [data, setData] = useState<OutputData | undefined>(undefined);
+  const [projectDescription, setProjectDescription] = useState<OutputData | undefined>(undefined);
+  const [editorInstance, setEditorInstance] = useState<EditorJS | null>(null);
 
   const form = useForm({
     initialValues: {
@@ -48,16 +54,38 @@ export const TitleForm = ({ project, isLoading }: TitleFormProps) => {
 
   useEffect(() => {
     if (project) {
-      form.setValues({ name: project.name, description: validateDescription(project.description) });
+      setProjectDescription(project.description ? parseJsonDesc(project.description) : undefined);
+      form.setValues({ name: project.name, description: validateDescription(projectDescription) });
     }
   }, [project]);
 
-  const enableSaveButton =
+  /*   const enableSaveButton =
     form.values.name !== "" &&
     (form.values.name !== project?.name ||
-      form.values.description !== validateDescription(project?.description))
+      form.values.description !== validateDescription(projectDescription))
       ? false
-      : true;
+      : true; */
+
+  // Save editor data on Form when change
+  useEffect(() => {
+    setTimeout(() => {
+      editorInstance
+        ?.save()
+        .then(outputData => {
+          form.setFieldValue("description", JSON.stringify(outputData));
+        })
+        .catch(error => console.log(error));
+    }, 100);
+  }, [editorInstance, data]);
+
+  // Render editor data
+  useEffect(() => {
+    if (projectDescription) {
+      editorInstance?.render(projectDescription);
+    } else {
+      editorInstance?.clear();
+    }
+  }, [editorInstance, projectDescription]);
 
   return isLoading ? (
     <Stack>
@@ -71,37 +99,26 @@ export const TitleForm = ({ project, isLoading }: TitleFormProps) => {
           autosize
           size="lg"
           minRows={1}
-          variant="filled"
           placeholder="Project Name"
           styles={theme => ({
             input: {
               fontSize: 22,
-              backgroundColor:
-                theme.colorScheme === "dark" ? theme.colors.dark[7] : theme.colors.gray[1],
             },
           })}
           {...form.getInputProps("name")}
         />
-
-        <Textarea
-          autosize
-          size="sm"
-          placeholder="Add description..."
-          minRows={2}
-          variant="filled"
-          styles={theme => ({
-            input: {
-              backgroundColor:
-                theme.colorScheme === "dark" ? theme.colors.dark[7] : theme.colors.gray[1],
-            },
-          })}
-          {...form.getInputProps("description")}
+        <EditorInput
+          setData={setData}
+          setEditorInstance={setEditorInstance}
+          editorId="editorjs-project"
+          data={projectDescription}
         />
+
         <Group position="right">
           <Button
             compact
             type="submit"
-            disabled={enableSaveButton}
+            /* disabled={enableSaveButton} */
             loading={updateProject.fetching}
           >
             Save
