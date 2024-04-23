@@ -105,16 +105,17 @@ const ProjectDetailContent = ({ project, isLoading }: ProjectDetailProps) => {
 
   return (
     <Group p={"md"} sx={{ alignItems: "baseline" }}>
-      <Stack maw={860} mx="auto" h={"100%"} sx={{ flexGrow: 1 }}>
-        <Stack spacing={10}>
-          <Group position="apart" className={classes.headerSections}>
-            {isLoading ? (
-              <Skeleton width={50} height={8} />
-            ) : (
-              <Text size={"sm"} color={"dimmed"}>
-                {project?.prefix ? project.prefix : "PR-001"}
-              </Text>
-            )}
+      <ScrollArea offsetScrollbars type="hover" sx={{ flex: 1, height: "calc(100vh - 109px)" }}>
+        <Stack m={"auto"} maw={860}>
+          <Stack spacing={10}>
+            <Group position="apart" className={classes.headerSections}>
+              {isLoading ? (
+                <Skeleton width={50} height={8} />
+              ) : (
+                <Text size={"sm"} color={"dimmed"}>
+                  {project?.prefix ? project.prefix : "PR-001"}
+                </Text>
+              )}
 
               <ProjectMenu project={project}>
                 <ActionIcon radius={"sm"} size={"xs"} disabled={project?.id ? false : true}>
@@ -148,10 +149,12 @@ const ProjectDetailContent = ({ project, isLoading }: ProjectDetailProps) => {
           </Stack>
 
           <Divider />
+
           <TitleForm project={project} isLoading={isLoading} />
         </Stack>
+      </ScrollArea>
 
-        <Divider orientation="vertical" className={classes.propsSection} />
+      <Divider orientation="vertical" className={classes.propsSection} />
 
       <Stack miw={320} maw={400} className={classes.propsSection}>
         <Group className={classes.headerSections}>
@@ -227,38 +230,37 @@ const ProjectDetailContent = ({ project, isLoading }: ProjectDetailProps) => {
             Start Date
           </Text>
 
-            {isLoading ? (
-              <Skeleton height={26} width={100} />
-            ) : (
-              <Tooltip label="Start Date" position="bottom">
-                <DateGenericSelector
-                  placeholder={"Set start date"}
-                  date={startDate}
-                  onChange={handleStartDateChange}
-                />
-              </Tooltip>
-            )}
-          </Group>
-          <Group>
-            <Text w={90} lineClamp={1} size={"sm"} color={"dimmed"}>
-              Due Date
-            </Text>
+          {isLoading ? (
+            <Skeleton height={26} width={100} />
+          ) : (
+            <Tooltip label="Start Date" position="bottom">
+              <DateGenericSelector
+                placeholder={"Set start date"}
+                date={startDate}
+                onChange={handleStartDateChange}
+              />
+            </Tooltip>
+          )}
+        </Group>
+        <Group>
+          <Text w={90} lineClamp={1} size={"sm"} color={"dimmed"}>
+            Due Date
+          </Text>
 
-            {isLoading ? (
-              <Skeleton height={26} width={100} />
-            ) : (
-              <Tooltip label="Due Date" position="bottom">
-                <DateGenericSelector
-                  placeholder={"Set due date"}
-                  date={dueDate}
-                  onChange={handleDueDateChange}
-                />
-              </Tooltip>
-            )}
-          </Group>
-        </Stack>
-      </Group>
-    </Stack>
+          {isLoading ? (
+            <Skeleton height={26} width={100} />
+          ) : (
+            <Tooltip label="Due Date" position="bottom">
+              <DateGenericSelector
+                placeholder={"Set due date"}
+                date={dueDate}
+                onChange={handleDueDateChange}
+              />
+            </Tooltip>
+          )}
+        </Group>
+      </Stack>
+    </Group>
   );
 };
 
