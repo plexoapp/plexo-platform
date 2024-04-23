@@ -26,15 +26,14 @@ export const tools: {
     inlineToolbar: true,
   },
   code: Code,
-  linkTool: LinkTool,
-  // image: Image,
+  /*  linkTool: LinkTool, */
   simpleImage: SimpleImage,
-  attaches: {
+  /*  attaches: {
     class: AttachesTool,
-    /* config: {
+    config: {
       endpoint: "http://localhost:8008/uploadFile",
-    }, */
-  },
+    },
+  }, */
   table: Table,
   checklist: {
     class: Checklist,
