@@ -10,6 +10,7 @@ import {
   CopyButton,
   Tooltip,
   Skeleton,
+  ScrollArea,
 } from "@mantine/core";
 import { useEffect, useState } from "react";
 import { Copy, Dots, LayoutSidebar } from "tabler-icons-react";
@@ -124,52 +125,53 @@ const ProjectDetailContent = ({ project, isLoading }: ProjectDetailProps) => {
         <Text>Project</Text>
       </Group>
       <Group px={20} sx={{ alignItems: "baseline" }}>
-        <Stack maw={860} m="auto" h={"100%"} sx={{ flex: 1 }}>
-          <Stack spacing={10}>
-            <Group position="apart" className={classes.headerSections}>
-              {isLoading ? (
-                <Skeleton width={50} height={8} />
-              ) : (
-                <Text size={"sm"} color={"dimmed"}>
-                  {project?.prefix ? project.prefix : "PR-001"}
-                </Text>
-              )}
+        <ScrollArea offsetScrollbars type="hover" sx={{ flex: 1, height: "calc(100vh - 90px)" }}>
+          <Stack m={"auto"} maw={860}>
+            <Stack spacing={10}>
+              <Group position="apart" className={classes.headerSections}>
+                {isLoading ? (
+                  <Skeleton width={50} height={8} />
+                ) : (
+                  <Text size={"sm"} color={"dimmed"}>
+                    {project?.prefix ? project.prefix : "PR-001"}
+                  </Text>
+                )}
 
-              <ProjectMenu project={project}>
-                <ActionIcon radius={"sm"} size={"xs"} disabled={project?.id ? false : true}>
-                  <Dots size={18} />
-                </ActionIcon>
-              </ProjectMenu>
-            </Group>
-            {isLoading ? (
-              <Box className={classes.propsBar}>
-                <Skeleton height={20} />
-              </Box>
-            ) : (
-              <Group spacing={5} className={classes.propsBar}>
-                <StatusSelectorByProject project={project} type="button" />
-                <LeadSelectorByProject project={project} />
-                <MemberSelectorByProject project={project} />
-                <TeamSelectorByProject project={project} />
-                <VisibilitySelectorByProject project={project} type="button" />
-                <DateGenericSelector
-                  placeholder={"Set start date"}
-                  date={startDate}
-                  onChange={handleStartDateChange}
-                />
-                <DateGenericSelector
-                  placeholder={"Set due date"}
-                  date={dueDate}
-                  onChange={handleDueDateChange}
-                />
+                <ProjectMenu project={project}>
+                  <ActionIcon radius={"sm"} size={"xs"} disabled={project?.id ? false : true}>
+                    <Dots size={18} />
+                  </ActionIcon>
+                </ProjectMenu>
               </Group>
-            )}
+              {isLoading ? (
+                <Box className={classes.propsBar}>
+                  <Skeleton height={20} />
+                </Box>
+              ) : (
+                <Group spacing={5} className={classes.propsBar}>
+                  <StatusSelectorByProject project={project} type="button" />
+                  <LeadSelectorByProject project={project} />
+                  <MemberSelectorByProject project={project} />
+                  <TeamSelectorByProject project={project} />
+                  <VisibilitySelectorByProject project={project} type="button" />
+                  <DateGenericSelector
+                    placeholder={"Set start date"}
+                    date={startDate}
+                    onChange={handleStartDateChange}
+                  />
+                  <DateGenericSelector
+                    placeholder={"Set due date"}
+                    date={dueDate}
+                    onChange={handleDueDateChange}
+                  />
+                </Group>
+              )}
+            </Stack>
+
+            <Divider />
+            <TitleForm project={project} isLoading={isLoading} />
           </Stack>
-
-          <Divider />
-          <TitleForm project={project} isLoading={isLoading} />
-        </Stack>
-
+        </ScrollArea>
         <Divider orientation="vertical" className={classes.propsSection} />
 
         <Stack miw={320} maw={400} className={classes.propsSection}>
@@ -249,13 +251,11 @@ const ProjectDetailContent = ({ project, isLoading }: ProjectDetailProps) => {
             {isLoading ? (
               <Skeleton height={26} width={100} />
             ) : (
-              <Tooltip label="Start Date" position="bottom">
-                <DateGenericSelector
-                  placeholder={"Set start date"}
-                  date={startDate}
-                  onChange={handleStartDateChange}
-                />
-              </Tooltip>
+              <DateGenericSelector
+                placeholder={"Set start date"}
+                date={startDate}
+                onChange={handleStartDateChange}
+              />
             )}
           </Group>
           <Group>
@@ -266,13 +266,11 @@ const ProjectDetailContent = ({ project, isLoading }: ProjectDetailProps) => {
             {isLoading ? (
               <Skeleton height={26} width={100} />
             ) : (
-              <Tooltip label="Due Date" position="bottom">
-                <DateGenericSelector
-                  placeholder={"Set due date"}
-                  date={dueDate}
-                  onChange={handleDueDateChange}
-                />
-              </Tooltip>
+              <DateGenericSelector
+                placeholder={"Set due date"}
+                date={dueDate}
+                onChange={handleDueDateChange}
+              />
             )}
           </Group>
         </Stack>

@@ -13,13 +13,42 @@ type TitleFormProps = {
   isLoading: boolean;
 };
 
-const validateDescription = (description: string | null | undefined) => {
-  return description ? description : "";
+const parseJsonDesc = (description: string): OutputData | undefined => {
+  const time = new Date().getTime();
+
+  try {
+    return JSON.parse(description);
+  } catch (error) {
+    if (error instanceof SyntaxError) {
+      return {
+        time: time,
+        blocks: [
+          {
+            id: "1",
+            type: "paragraph",
+            data: {
+              text: description,
+            },
+          },
+        ],
+        version: "2.29.1",
+      };
+    } else {
+      console.error("Error parsing JSON:", error);
+    }
+  }
+
+  return undefined;
+};
+
+const validateDescription = (description: OutputData | undefined) => {
+  return description ? JSON.stringify(description) : "";
 };
 
 export const TitleForm = ({ project, isLoading }: TitleFormProps) => {
   const { updateProject, fetchUpdateProject } = useActions();
   const [data, setData] = useState<OutputData | undefined>(undefined);
+  const [projectDescription, setProjectDescription] = useState<OutputData | undefined>(undefined);
   const [editorInstance, setEditorInstance] = useState<EditorJS | null>(null);
 
   const form = useForm({
@@ -52,29 +81,38 @@ export const TitleForm = ({ project, isLoading }: TitleFormProps) => {
 
   useEffect(() => {
     if (project) {
-      form.setValues({ name: project.name, description: validateDescription(project.description) });
+      setProjectDescription(project.description ? parseJsonDesc(project.description) : undefined);
+      form.setValues({ name: project.name, description: validateDescription(projectDescription) });
     }
   }, [project]);
 
-  const enableSaveButton =
+  /*   const enableSaveButton =
     form.values.name !== "" &&
     (form.values.name !== project?.name ||
-      form.values.description !== validateDescription(project?.description))
+      form.values.description !== validateDescription(projectDescription))
       ? false
-      : true;
+      : true; */
 
-  // Get editor data
+  // Save editor data on Form when change
   useEffect(() => {
     setTimeout(() => {
       editorInstance
         ?.save()
         .then(outputData => {
-          console.log(JSON.stringify(outputData));
-          /* setDescription(JSON.stringify(outputData)); */
+          form.setFieldValue("description", JSON.stringify(outputData));
         })
         .catch(error => console.log(error));
     }, 100);
   }, [editorInstance, data]);
+
+  // Render editor data
+  useEffect(() => {
+    if (projectDescription) {
+      editorInstance?.render(projectDescription);
+    } else {
+      editorInstance?.clear();
+    }
+  }, [editorInstance, projectDescription]);
 
   return isLoading ? (
     <Stack>
@@ -100,28 +138,14 @@ export const TitleForm = ({ project, isLoading }: TitleFormProps) => {
           setData={setData}
           setEditorInstance={setEditorInstance}
           editorId="editorjs-project"
+          data={projectDescription}
         />
-
-        {/*  <Textarea
-          autosize
-          size="sm"
-          placeholder="Add description..."
-          minRows={2}
-          variant="filled"
-          styles={theme => ({
-            input: {
-              backgroundColor:
-                theme.colorScheme === "dark" ? theme.colors.dark[7] : theme.colors.gray[1],
-            },
-          })}
-          {...form.getInputProps("description")}
-        /> */}
 
         <Group position="right">
           <Button
             compact
             type="submit"
-            disabled={enableSaveButton}
+            /* disabled={enableSaveButton} */
             loading={updateProject.fetching}
           >
             Save

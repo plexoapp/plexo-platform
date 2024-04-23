@@ -13,14 +13,43 @@ type TitleFormProps = {
   isLoading: boolean;
 };
 
-const validateDescription = (description: string | null | undefined) => {
-  return description ? description : "";
+const parseJsonDesc = (description: string): OutputData | undefined => {
+  const time = new Date().getTime();
+
+  try {
+    return JSON.parse(description);
+  } catch (error) {
+    if (error instanceof SyntaxError) {
+      // Not valid JSON, return a JSON object with the text
+      return {
+        time: time,
+        blocks: [
+          {
+            id: "1",
+            type: "paragraph",
+            data: {
+              text: description,
+            },
+          },
+        ],
+        version: "2.29.1",
+      };
+    } else {
+      console.error("Error parsing JSON:", error);
+    }
+  }
+
+  return undefined;
+};
+
+const validateDescription = (description: OutputData | undefined) => {
+  return description ? JSON.stringify(description) : "";
 };
 
 export const TitleForm = ({ task, isLoading }: TitleFormProps) => {
   const { updateTask, fetchUpdateTask } = useActions();
   const [data, setData] = useState<OutputData | undefined>(undefined);
-  const [dataEditor, setDataEditor] = useState<OutputData | undefined>(undefined);
+  const [taskDescription, setTaskDescription] = useState<OutputData | undefined>(undefined);
   const [editorInstance, setEditorInstance] = useState<EditorJS | null>(null);
 
   const form = useForm({
@@ -51,40 +80,41 @@ export const TitleForm = ({ task, isLoading }: TitleFormProps) => {
     }
   };
 
+  // Fill form with task data
   useEffect(() => {
     if (task) {
-      setDataEditor(task.description ? JSON.parse(task.description) : undefined);
-      form.setValues({ title: task.title, description: validateDescription(task.description) });
+      setTaskDescription(task.description ? parseJsonDesc(task.description) : undefined);
+      form.setValues({ title: task.title, description: validateDescription(taskDescription) });
     }
   }, [task]);
 
-  const enableSaveButton =
+  /*   const enableSaveButton =
     form.values.title !== "" &&
     (form.values.title !== task?.title ||
-      form.values.description !== validateDescription(task?.description))
+      form.values.description !== validateDescription(taskDescription))
       ? false
-      : true;
+      : true; */
 
-  // Get editor data
+  // Save editor data on Form when change
   useEffect(() => {
     setTimeout(() => {
       editorInstance
         ?.save()
         .then(outputData => {
-          console.log(JSON.stringify(outputData));
-          /* setDescription(JSON.stringify(outputData)); */
+          form.setFieldValue("description", JSON.stringify(outputData));
         })
         .catch(error => console.log(error));
     }, 100);
   }, [editorInstance, data]);
 
+  // Render editor data
   useEffect(() => {
-    if (dataEditor) {
-      setTimeout(() => {
-        editorInstance?.render(dataEditor);
-      }, 100);
+    if (taskDescription) {
+      editorInstance?.render(taskDescription);
+    } else {
+      editorInstance?.clear();
     }
-  }, [dataEditor]);
+  }, [editorInstance, taskDescription]);
 
   return isLoading ? (
     <Stack>
@@ -110,25 +140,16 @@ export const TitleForm = ({ task, isLoading }: TitleFormProps) => {
           setData={setData}
           setEditorInstance={setEditorInstance}
           editorId="editorjs-task"
-          data={dataEditor}
+          data={taskDescription}
         />
 
-        {/* <Textarea
-          autosize
-          size="sm"
-          placeholder="Add description..."
-          minRows={2}
-          variant="filled"
-          styles={theme => ({
-            input: {
-              backgroundColor:
-                theme.colorScheme === "dark" ? theme.colors.dark[7] : theme.colors.gray[1],
-            },
-          })}
-          {...form.getInputProps("description")}
-        /> */}
         <Group position="right">
-          <Button compact type="submit" disabled={enableSaveButton} loading={updateTask.fetching}>
+          <Button
+            compact
+            type="submit"
+            /* disabled={enableSaveButton} */
+            loading={updateTask.fetching}
+          >
             Save
           </Button>
         </Group>

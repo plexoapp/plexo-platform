@@ -16,6 +16,7 @@ import {
   Avatar,
   Center,
   Skeleton,
+  ScrollArea,
 } from "@mantine/core";
 import { IconSparkles } from "@tabler/icons-react";
 import { Copy, Dots, LayoutSidebar, ChevronLeft, Plus, X } from "tabler-icons-react";
@@ -314,50 +315,51 @@ const TaskDetailPageContent = ({ task, isLoading }: TaskDetailProps) => {
         </Link>
       </Group>
       <Group px={20} sx={{ alignItems: "baseline" }}>
-        <Stack maw={860} m="auto" h={"100%"} sx={{ flex: 1 }}>
-          <Stack spacing={10}>
-            <Group position="apart" className={classes.headerSections}>
-              {isLoading ? (
-                <Skeleton width={50} height={8} />
-              ) : (
-                <Text lineClamp={1} size={"sm"} color={"dimmed"}>
-                  {`PLE-${task?.count}`}
-                </Text>
-              )}
+        <ScrollArea offsetScrollbars type="hover" sx={{ flex: 1, height: "calc(100vh - 90px)" }}>
+          <Stack m={"auto"} maw={860}>
+            <Stack spacing={10}>
+              <Group position="apart" className={classes.headerSections}>
+                {isLoading ? (
+                  <Skeleton width={50} height={8} />
+                ) : (
+                  <Text lineClamp={1} size={"sm"} color={"dimmed"}>
+                    {`PLE-${task?.count}`}
+                  </Text>
+                )}
 
-              <TaskMenu task={task}>
-                <ActionIcon radius={"sm"} size={"xs"} disabled={task?.id ? false : true}>
-                  <Dots size={18} />
-                </ActionIcon>
-              </TaskMenu>
-            </Group>
-            {isLoading ? (
-              <Box className={classes.propsBar}>
-                <Skeleton height={20} />
-              </Box>
-            ) : (
-              <Group spacing={5} className={classes.propsBar}>
-                <StatusSelectorByTask task={task} type="button" />
-                <PrioritySelectorByTask task={task} type="button" />
-                <LeadSelectorByTask task={task} type="button" />
-                <AssigneesSelectorByTask task={task} />
-                <LabelsSelectorBytask task={task} />
-                <ProjectSelectorByTask task={task} />
-                <DateGenericSelector
-                  placeholder={"Set due date"}
-                  date={dueDate}
-                  onChange={handleDateChange}
-                />
+                <TaskMenu task={task}>
+                  <ActionIcon radius={"sm"} size={"xs"} disabled={task?.id ? false : true}>
+                    <Dots size={18} />
+                  </ActionIcon>
+                </TaskMenu>
               </Group>
-            )}
+              {isLoading ? (
+                <Box className={classes.propsBar}>
+                  <Skeleton height={20} />
+                </Box>
+              ) : (
+                <Group spacing={5} className={classes.propsBar}>
+                  <StatusSelectorByTask task={task} type="button" />
+                  <PrioritySelectorByTask task={task} type="button" />
+                  <LeadSelectorByTask task={task} type="button" />
+                  <AssigneesSelectorByTask task={task} />
+                  <LabelsSelectorBytask task={task} />
+                  <ProjectSelectorByTask task={task} />
+                  <DateGenericSelector
+                    placeholder={"Set due date"}
+                    date={dueDate}
+                    onChange={handleDateChange}
+                  />
+                </Group>
+              )}
+            </Stack>
+
+            <Divider />
+            <TitleForm task={task} isLoading={isLoading} />
+            <SubTasks task={task} />
+            <ActivitiesTask task={task} isLoading={isLoading} />
           </Stack>
-
-          <Divider />
-          <TitleForm task={task} isLoading={isLoading} />
-          <SubTasks task={task} />
-          <ActivitiesTask task={task} isLoading={isLoading} />
-        </Stack>
-
+        </ScrollArea>
         <Divider orientation="vertical" className={classes.propsSection} />
         <Stack miw={320} maw={400} className={classes.propsSection}>
           <Group className={classes.headerSections}>
