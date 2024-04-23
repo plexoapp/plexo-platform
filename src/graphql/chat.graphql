@@ -1,0 +1,39 @@
+subscription SendMessage($chatId: UUID!, $message: String!) {
+  chat(input: { chatId: $chatId, message: $message }) {
+    delta
+    message
+    messageId
+    toolCalls {
+      id
+      type
+      function {
+        name
+        arguments
+      }
+    }
+  }
+}
+
+query GetChat($id: UUID) {
+  chats(input: { filter: { resourceId: $id } }) {
+    id
+    resourceId
+  }
+}
+
+mutation NewChat($resourceId: UUID!) {
+  createChat(input: { resourceId: $resourceId, resourceType: "project" }) {
+    id
+    resourceId
+  }
+}
+
+query GetMessages($chatId: UUID) {
+  messages(
+    input: { filter: { chatId: $chatId }, sortBy: "created_at", sortOrder: DESC, limit: 20 }
+  ) {
+    id
+    content
+    createdAt
+  }
+}

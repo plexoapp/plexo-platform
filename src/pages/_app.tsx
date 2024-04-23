@@ -27,6 +27,7 @@ type PlexoPlatformAppProps = {
   viewMode: "list" | "grid";
   authCookie: string;
   plexoAPIEndpoint: string;
+  plexoWSEndpoint: string;
 };
 
 const PlexoApp = ({
@@ -35,13 +36,14 @@ const PlexoApp = ({
   colorScheme,
   authCookie,
   plexoAPIEndpoint,
+  plexoWSEndpoint,
 }: AppPropsWithLayout<PlexoPlatformAppProps> & PlexoPlatformAppProps) => {
   const getLayout = Component.getLayout ?? (page => page);
 
   let graphQLEndpoint = `${plexoAPIEndpoint}/graphql`;
-  let graphQLWsEndpoint = `${plexoAPIEndpoint}/graphql/ws`;
+  let graphQLWsEndpoint = `${plexoWSEndpoint}/graphql/ws`;
 
-  const client = URQLClientSingleton.getClient(graphQLEndpoint, graphQLWsEndpoint);
+  const client = URQLClientSingleton.getClient(graphQLEndpoint, graphQLWsEndpoint, authCookie);
 
   return (
     <>
@@ -70,6 +72,7 @@ PlexoApp.getInitialProps = ({ ctx }: { ctx: GetServerSidePropsContext }) => {
     viewMode: getCookie("viewMode", ctx) || "list",
     authCookie: getCookie("plexo-session-token", ctx) || "",
     plexoAPIEndpoint: process.env.PLEXO_API_ENDPOINT || "",
+    plexoWSEndpoint: process.env.PLEXO_API_ENDPOINT?.replaceAll("http", "ws") || "",
   };
 };
 

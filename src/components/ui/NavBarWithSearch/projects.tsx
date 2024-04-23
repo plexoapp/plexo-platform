@@ -1,11 +1,11 @@
-import { Navbar, NavLink, Skeleton, Stack, useMantineTheme } from "@mantine/core";
+import { Menu, Navbar, NavLink, Skeleton, Stack, useMantineTheme } from "@mantine/core";
 import { Rocket } from "tabler-icons-react";
 import router from "next/router";
 
 import { Project } from "lib/types";
 import { usePlexoContext } from "context/PlexoContext";
 
-const ProjectsList = () => {
+export const ProjectsList = () => {
   const theme = useMantineTheme();
   const { projectsData, isLoadingProjects } = usePlexoContext();
 
@@ -41,4 +41,28 @@ const ProjectsList = () => {
   );
 };
 
-export default ProjectsList;
+export const ProjectMenuList = () => {
+  const theme = useMantineTheme();
+  const { projectsData, isLoadingProjects } = usePlexoContext();
+
+  const projects = projectsData
+    ?.sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime())
+    .map((p: Project, index: number) => {
+      return (
+        <Menu.Item
+          key={index}
+          icon={<Rocket size={16} color={theme.colors.brand[6]} />}
+          onClick={() => router.push(`/projects/${p.id}`)}
+          styles={theme => ({
+            root: {
+              borderRadius: theme.radius.sm,
+            },
+          })}
+        >
+          {p.name}
+        </Menu.Item>
+      );
+    });
+
+  return projects;
+};
