@@ -7,39 +7,11 @@ import { useActions } from "lib/hooks/useActions";
 import { ErrorNotification, SuccessNotification } from "lib/notifications";
 import { TaskById } from "lib/types";
 import { useEffect, useState } from "react";
+import { parseJsonDesc } from "lib/utils";
 
 type TitleFormProps = {
   task: TaskById | undefined;
   isLoading: boolean;
-};
-
-const parseJsonDesc = (description: string): OutputData | undefined => {
-  const time = new Date().getTime();
-
-  try {
-    return JSON.parse(description);
-  } catch (error) {
-    if (error instanceof SyntaxError) {
-      // Not valid JSON, return a JSON object with the text
-      return {
-        time: time,
-        blocks: [
-          {
-            id: "1",
-            type: "paragraph",
-            data: {
-              text: description,
-            },
-          },
-        ],
-        version: "2.29.1",
-      };
-    } else {
-      console.error("Error parsing JSON:", error);
-    }
-  }
-
-  return undefined;
 };
 
 const validateDescription = (description: OutputData | undefined) => {

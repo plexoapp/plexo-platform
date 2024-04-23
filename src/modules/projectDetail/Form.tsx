@@ -7,38 +7,11 @@ import { ErrorNotification, SuccessNotification } from "lib/notifications";
 import { ProjectById } from "lib/types";
 import { useEffect, useState } from "react";
 import { EditorInput } from "components/ui/Editor/EditorInput";
+import { parseJsonDesc } from "lib/utils";
 
 type TitleFormProps = {
   project: ProjectById | undefined;
   isLoading: boolean;
-};
-
-const parseJsonDesc = (description: string): OutputData | undefined => {
-  const time = new Date().getTime();
-
-  try {
-    return JSON.parse(description);
-  } catch (error) {
-    if (error instanceof SyntaxError) {
-      return {
-        time: time,
-        blocks: [
-          {
-            id: "1",
-            type: "paragraph",
-            data: {
-              text: description,
-            },
-          },
-        ],
-        version: "2.29.1",
-      };
-    } else {
-      console.error("Error parsing JSON:", error);
-    }
-  }
-
-  return undefined;
 };
 
 const validateDescription = (description: OutputData | undefined) => {
