@@ -14,12 +14,15 @@ import {
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { useState } from "react";
-import { Edit } from "tabler-icons-react";
+import { Edit, Trash } from "tabler-icons-react";
 
 import { UpdateMemberModal } from "./UpdateMemberForm";
 import { NewMemberModal } from "./NewMemberForm";
 import { usePlexoContext } from "context/PlexoContext";
-import { MemberRole } from "integration/graphql";
+import { DeleteMemberDocument, MemberRole } from "integration/graphql";
+import { modals, openConfirmModal } from "@mantine/modals";
+import { useMutation } from "urql";
+import { ErrorNotification, SuccessNotification } from "lib/notifications";
 
 const useStyles = createStyles(theme => ({
   rowSelected: {
@@ -49,9 +52,47 @@ const EditMemberAction = ({ member }: { member: MemberProps }) => {
   return (
     <>
       <ActionIcon>
-        <Edit size={18} onClick={open} />
+        <Edit size={16} strokeWidth={1.5} onClick={open} />
       </ActionIcon>
       <UpdateMemberModal opened={opened} close={close} member={member} />
+    </>
+  );
+};
+
+const DeleteMemberAction = ({ member }: { member: MemberProps }) => {
+  const [deleteMemberResult, fetchDeleteMember] = useMutation(DeleteMemberDocument);
+
+  const onDeleteMember = async () => {
+    const res = await fetchDeleteMember({
+      id: member.id,
+    });
+
+    if (res.data) {
+      modals.closeAll();
+      SuccessNotification("Member deleted", res.data.deleteMember.name);
+    }
+    if (res.error) {
+      ErrorNotification();
+    }
+  };
+
+  const openDeleteModal = () =>
+    openConfirmModal({
+      id: "DeleteMember",
+      title: "Delete member",
+      centered: true,
+      children: <Text size="sm">Are you sure you want to delete the member?</Text>,
+      labels: { confirm: "Delete", cancel: "Cancel" },
+      onConfirm: () => onDeleteMember(),
+      closeOnConfirm: false,
+      confirmProps: { color: "red", loading: deleteMemberResult.fetching },
+    });
+
+  return (
+    <>
+      <ActionIcon onClick={openDeleteModal} color="red">
+        <Trash size={16} strokeWidth={1.5} />
+      </ActionIcon>
     </>
   );
 };
@@ -103,6 +144,11 @@ export const MembersSection = ({ data }: MembersSectionProps) => {
               <EditMemberAction member={item} />
             </td>
           )}
+          {isAdmin && (
+            <td>
+              <DeleteMemberAction member={item} />
+            </td>
+          )}
         </tr>
       );
     });
@@ -136,6 +182,7 @@ export const MembersSection = ({ data }: MembersSectionProps) => {
                 <th>Email</th>
                 <th>Job</th>
                 {isAdmin && <th>Edit</th>}
+                {isAdmin && <th>Delete</th>}
               </tr>
             </thead>
             <tbody>{rows}</tbody>
