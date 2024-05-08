@@ -45,7 +45,7 @@ const TeamDetailPageContent = ({ team, isLoading }: TeamDetailProps) => {
   const { classes } = useStyles();
 
   return (
-    <Group p={"md"} sx={{ alignItems: "baseline" }}>
+    <Group sx={{ alignItems: "baseline" }}>
       <Stack maw={860} mx="auto" h={"100%"} sx={{ flexGrow: 1 }}>
         <Stack spacing={10}>
           <Group position="apart" className={classes.headerSections}>
