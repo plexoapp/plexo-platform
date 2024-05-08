@@ -158,7 +158,8 @@ export function NavbarSearch({ onNewTask, openedNav, setCollapseNavbar }: NavBar
 
   return (
     <Navbar
-      width={{ sm: 300 }}
+      h={"100vh"}
+      width={{ md: 300, lg: 300 }}
       hiddenBreakpoint="md"
       hidden={!openedNav}
       className={classes.navbar}
