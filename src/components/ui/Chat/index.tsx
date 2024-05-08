@@ -230,7 +230,19 @@ const Chat = ({ chatOpened }: ChatProps) => {
   };
 
   return (
-    <Aside width={{ sm: 350 }} hiddenBreakpoint="md" hidden={!chatOpened}>
+    <Aside
+      width={{ md: 350, lg: 350 }}
+      styles={{
+        root: {
+          [theme.fn.smallerThan("md")]: {
+            width: 350,
+          },
+          [theme.fn.smallerThan("xs")]: {
+            width: "100%",
+          },
+        },
+      }}
+    >
       <Aside.Section
         bg={theme.colorScheme === "dark" ? theme.colors.dark[6] : theme.colors.gray[1]}
       >

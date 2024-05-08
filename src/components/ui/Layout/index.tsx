@@ -4,8 +4,8 @@ import {
   createStyles,
   Drawer,
   Group,
+  Header,
   MediaQuery,
-  Stack,
   Text,
   Tooltip,
 } from "@mantine/core";
@@ -100,7 +100,7 @@ const Layout = ({ pageTitle, button, children }: LayoutProps) => {
         />
       </Drawer>
 
-      <Drawer
+      {/* <Drawer
         size={350}
         padding={0}
         position="right"
@@ -116,13 +116,16 @@ const Layout = ({ pageTitle, button, children }: LayoutProps) => {
         })}
       >
         <Chat chatOpened={chatOpened} />
-      </Drawer>
+      </Drawer> */}
 
       <AppShell
-        fixed
-        padding={0}
+        styles={{
+          main: {
+            background: theme.colorScheme === "dark" ? theme.colors.dark[8] : theme.colors.gray[0],
+          },
+        }}
+        layout="alt"
         navbarOffsetBreakpoint="md"
-        asideOffsetBreakpoint="md"
         navbar={
           collapseNavbar ? (
             <NavbarMinimal setCollapseNavbar={setCollapseNavbar} openedNav={false} />
@@ -138,52 +141,48 @@ const Layout = ({ pageTitle, button, children }: LayoutProps) => {
           )
         }
         aside={chatOpened ? <Chat chatOpened={false} /> : undefined}
-        styles={theme => ({
-          main: {
-            backgroundColor:
-              theme.colorScheme === "dark" ? theme.colors.dark[8] : theme.colors.gray[0],
-          },
-        })}
-      >
-        <Stack spacing={0}>
-          <Group
-            p={"md"}
-            h={73}
-            position="apart"
-            sx={{
-              "&:not(:last-of-type)": {
-                borderBottom: `1px solid ${
-                  theme.colorScheme === "dark" ? theme.colors.dark[4] : theme.colors.gray[3]
-                }`,
-              },
-            }}
-          >
-            <Group>
-              <MediaQuery largerThan="md" styles={{ display: "none" }}>
-                <ActionIcon onClick={() => setNavBarOpened(true)}>
-                  <LayoutSidebar size={16} />
-                </ActionIcon>
-              </MediaQuery>
+        header={
+          <Header height={{ base: 73, md: 73 }}>
+            <Group
+              p={"md"}
+              h={"100%"}
+              position="apart"
+              sx={{
+                "&:not(:last-of-type)": {
+                  borderBottom: `1px solid ${
+                    theme.colorScheme === "dark" ? theme.colors.dark[4] : theme.colors.gray[3]
+                  }`,
+                },
+              }}
+            >
               <Group>
-                {button}
-                <Text>{pageTitle}</Text>
+                <MediaQuery largerThan="md" styles={{ display: "none" }}>
+                  <ActionIcon onClick={() => setNavBarOpened(true)}>
+                    <LayoutSidebar size={16} />
+                  </ActionIcon>
+                </MediaQuery>
+                <Group>
+                  {button}
+                  <Text>{pageTitle}</Text>
+                </Group>
+              </Group>
+
+              <Group>
+                <Tooltip label="Chat with Plexo">
+                  <ActionIcon
+                    variant="filled"
+                    color="brand"
+                    onClick={() => setChatOpened(!chatOpened)}
+                  >
+                    <MessageCircle2 size={18} />
+                  </ActionIcon>
+                </Tooltip>
               </Group>
             </Group>
-
-            <Group>
-              <Tooltip label="Chat with Plexo">
-                <ActionIcon
-                  variant="filled"
-                  color="brand"
-                  onClick={() => setChatOpened(!chatOpened)}
-                >
-                  <MessageCircle2 size={18} />
-                </ActionIcon>
-              </Tooltip>
-            </Group>
-          </Group>
-          {children}
-        </Stack>
+          </Header>
+        }
+      >
+        {children}
       </AppShell>
     </>
   );

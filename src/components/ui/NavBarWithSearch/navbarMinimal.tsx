@@ -101,7 +101,12 @@ export function NavbarMinimal({
   } = usePlexoContext();
 
   return (
-    <Navbar width={{ sm: 80 }} hiddenBreakpoint="md" hidden={!openedNav} className={classes.navbar}>
+    <Navbar
+      width={{ md: 80, lg: 80 }}
+      hiddenBreakpoint="md"
+      hidden={!openedNav}
+      className={classes.navbar}
+    >
       <Center>
         <UserButton
           logoutURL={`${plexoAPIEndpoint}/auth/logout`}
