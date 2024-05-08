@@ -8,13 +8,14 @@ import {
   Popover,
   Tooltip,
   ActionIcon,
-  createStyles,
   Stack,
   Collapse,
+  useMantineTheme,
 } from "@mantine/core";
 import { DatePicker } from "@mantine/dates";
 import { useToggle } from "@mantine/hooks";
 import { showNotification } from "@mantine/notifications";
+import EditorJS, { OutputData } from "@editorjs/editorjs";
 import { CalendarTime, Check, Robot, Subtask, X } from "tabler-icons-react";
 import { useState, useEffect } from "react";
 import { useQuery } from "urql";
@@ -31,6 +32,7 @@ import { priorityName, PrioritySelector } from "./priority";
 import { TaskStatus, TaskPriority, SuggestNewTaskDocument } from "integration/graphql";
 import NewSubTasks from "./newSubtasks";
 import { usePlexoContext } from "context/PlexoContext";
+import { EditorInput } from "../Editor/EditorInput";
 
 type NewTaskProps = {
   newTaskOpened: boolean;
@@ -45,16 +47,6 @@ export type SubTask = {
   lead: Member | null;
 };
 
-const useStyles = createStyles(theme => ({
-  input: {
-    backgroundColor: "transparent",
-    borderColor: "transparent",
-    "&:focus-within": {
-      borderColor: theme.colors.brand[6],
-    },
-  },
-}));
-
 const parseSubtasks = (subtasks: SubTask[]) => {
   return subtasks.map(task => {
     return {
@@ -66,10 +58,13 @@ const parseSubtasks = (subtasks: SubTask[]) => {
 };
 
 const NewTask = ({ newTaskOpened, setNewTaskOpened, createMore, setCreateMore }: NewTaskProps) => {
-  const { classes, theme } = useStyles();
+  const theme = useMantineTheme();
   const [showSubtasks, toggleSubtasks] = useToggle([false, true]);
   const { createTask, fetchCreateTask } = useActions();
   const { taskId, setTaskId } = usePlexoContext();
+  //Editor states
+  const [data, setData] = useState<OutputData | undefined>(undefined);
+  const [editorInstance, setEditorInstance] = useState<EditorJS | null>(null);
 
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
@@ -172,6 +167,18 @@ const NewTask = ({ newTaskOpened, setNewTaskOpened, createMore, setCreateMore }:
     setTaskId(undefined);
   };
 
+  // Get editor data
+  useEffect(() => {
+    setTimeout(() => {
+      editorInstance
+        ?.save()
+        .then(outputData => {
+          setDescription(JSON.stringify(outputData));
+        })
+        .catch(error => console.log(error));
+    }, 100);
+  }, [editorInstance, data]);
+
   return (
     <Modal
       closeOnEscape
@@ -209,26 +216,17 @@ const NewTask = ({ newTaskOpened, setNewTaskOpened, createMore, setCreateMore }:
       <Stack spacing={10}>
         <Textarea
           autosize
-          data-autofocus
+          autoFocus
           size="md"
           minRows={1}
           placeholder="Task Title"
           value={title}
           onChange={e => setTitle(e.target.value)}
-          classNames={{
-            input: classes.input,
-          }}
         />
-        <Textarea
-          autosize
-          placeholder="Add description..."
-          size="sm"
-          minRows={2}
-          value={description}
-          onChange={e => setDescription(e.target.value)}
-          classNames={{
-            input: classes.input,
-          }}
+        <EditorInput
+          setData={setData}
+          setEditorInstance={setEditorInstance}
+          editorId="editorjs-newtask"
         />
         <Group spacing={6} mb={"md"}>
           <StatusSelector status={status} setStatus={setStatus} type="button" />

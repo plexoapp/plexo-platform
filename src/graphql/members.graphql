@@ -20,3 +20,11 @@ mutation UpdateMember($id: UUID!, $input: UpdateMemberInput!) {
     role
   }
 }
+
+mutation DeleteMember($id: UUID!) {
+  deleteMember(id: $id) {
+    id
+    name
+    email
+  }
+}

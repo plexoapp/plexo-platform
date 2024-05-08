@@ -1,22 +1,28 @@
 import { Button, Group, Skeleton, Stack, Textarea } from "@mantine/core";
 import { useForm } from "@mantine/form";
+import EditorJS, { OutputData } from "@editorjs/editorjs";
 
+import { EditorInput } from "components/ui/Editor/EditorInput";
 import { useActions } from "lib/hooks/useActions";
 import { ErrorNotification, SuccessNotification } from "lib/notifications";
 import { TaskById } from "lib/types";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import { parseJsonDesc } from "lib/utils";
 
 type TitleFormProps = {
   task: TaskById | undefined;
   isLoading: boolean;
 };
 
-const validateDescription = (description: string | null | undefined) => {
-  return description ? description : "";
+const validateDescription = (description: OutputData | undefined) => {
+  return description ? JSON.stringify(description) : "";
 };
 
 export const TitleForm = ({ task, isLoading }: TitleFormProps) => {
   const { updateTask, fetchUpdateTask } = useActions();
+  const [data, setData] = useState<OutputData | undefined>(undefined);
+  const [taskDescription, setTaskDescription] = useState<OutputData | undefined>(undefined);
+  const [editorInstance, setEditorInstance] = useState<EditorJS | null>(null);
 
   const form = useForm({
     initialValues: {
@@ -46,18 +52,41 @@ export const TitleForm = ({ task, isLoading }: TitleFormProps) => {
     }
   };
 
+  // Fill form with task data
   useEffect(() => {
     if (task) {
-      form.setValues({ title: task.title, description: validateDescription(task.description) });
+      setTaskDescription(task.description ? parseJsonDesc(task.description) : undefined);
+      form.setValues({ title: task.title, description: validateDescription(taskDescription) });
     }
   }, [task]);
 
-  const enableSaveButton =
+  /*   const enableSaveButton =
     form.values.title !== "" &&
     (form.values.title !== task?.title ||
-      form.values.description !== validateDescription(task?.description))
+      form.values.description !== validateDescription(taskDescription))
       ? false
-      : true;
+      : true; */
+
+  // Save editor data on Form when change
+  useEffect(() => {
+    setTimeout(() => {
+      editorInstance
+        ?.save()
+        .then(outputData => {
+          form.setFieldValue("description", JSON.stringify(outputData));
+        })
+        .catch(error => console.log(error));
+    }, 100);
+  }, [editorInstance, data]);
+
+  // Render editor data
+  useEffect(() => {
+    if (taskDescription) {
+      editorInstance?.render(taskDescription);
+    } else {
+      editorInstance?.clear();
+    }
+  }, [editorInstance, taskDescription]);
 
   return isLoading ? (
     <Stack>
@@ -71,34 +100,28 @@ export const TitleForm = ({ task, isLoading }: TitleFormProps) => {
           autosize
           size="lg"
           minRows={1}
-          variant="filled"
           placeholder="Task Title"
           styles={theme => ({
             input: {
               fontSize: 22,
-              backgroundColor:
-                theme.colorScheme === "dark" ? theme.colors.dark[7] : theme.colors.gray[1],
             },
           })}
           {...form.getInputProps("title")}
         />
-
-        <Textarea
-          autosize
-          size="sm"
-          placeholder="Add description..."
-          minRows={2}
-          variant="filled"
-          styles={theme => ({
-            input: {
-              backgroundColor:
-                theme.colorScheme === "dark" ? theme.colors.dark[7] : theme.colors.gray[1],
-            },
-          })}
-          {...form.getInputProps("description")}
+        <EditorInput
+          setData={setData}
+          setEditorInstance={setEditorInstance}
+          editorId="editorjs-task"
+          data={taskDescription}
         />
+
         <Group position="right">
-          <Button compact type="submit" disabled={enableSaveButton} loading={updateTask.fetching}>
+          <Button
+            compact
+            type="submit"
+            /* disabled={enableSaveButton} */
+            loading={updateTask.fetching}
+          >
             Save
           </Button>
         </Group>
