@@ -214,7 +214,7 @@ const TasksBoard = ({ taskData, fetching }: TasksProps) => {
         {StatusBoardEnable(TaskStatus.None) && (
           <Stack spacing={0} sx={{ minWidth: 312 }}>
             <Counter status={TaskStatus.None} fetching={fetching} />
-            <ScrollArea style={{ height: 812 }} offsetScrollbars>
+            <ScrollArea style={{ height: "calc(100vh - 247px)" }} offsetScrollbars>
               {fetching ? (
                 <Skeleton height={36} radius="sm" />
               ) : (
@@ -226,7 +226,7 @@ const TasksBoard = ({ taskData, fetching }: TasksProps) => {
         {StatusBoardEnable(TaskStatus.Backlog) && (
           <Stack spacing={0} sx={{ minWidth: 312 }}>
             <Counter status={TaskStatus.Backlog} fetching={fetching} />
-            <ScrollArea style={{ height: 812 }} offsetScrollbars>
+            <ScrollArea style={{ height: "calc(100vh - 247px)" }} offsetScrollbars>
               {fetching ? (
                 <Skeleton height={36} radius="sm" />
               ) : (
@@ -238,7 +238,7 @@ const TasksBoard = ({ taskData, fetching }: TasksProps) => {
         {StatusBoardEnable(TaskStatus.ToDo) && (
           <Stack spacing={0} sx={{ minWidth: 312 }}>
             <Counter status={TaskStatus.ToDo} fetching={fetching} />
-            <ScrollArea style={{ height: 812 }} offsetScrollbars>
+            <ScrollArea style={{ height: "calc(100vh - 247px)" }} offsetScrollbars>
               {fetching ? (
                 <Skeleton height={36} radius="sm" />
               ) : (
@@ -250,7 +250,7 @@ const TasksBoard = ({ taskData, fetching }: TasksProps) => {
         {StatusBoardEnable(TaskStatus.InProgress) && (
           <Stack spacing={0} sx={{ minWidth: 312 }}>
             <Counter status={TaskStatus.InProgress} fetching={fetching} />
-            <ScrollArea style={{ height: 812 }} offsetScrollbars>
+            <ScrollArea style={{ height: "calc(100vh - 247px)" }} offsetScrollbars>
               {fetching ? (
                 <Skeleton height={36} radius="sm" />
               ) : (
@@ -262,7 +262,7 @@ const TasksBoard = ({ taskData, fetching }: TasksProps) => {
         {StatusBoardEnable(TaskStatus.Done) && (
           <Stack spacing={0} sx={{ minWidth: 312 }}>
             <Counter status={TaskStatus.Done} fetching={fetching} />
-            <ScrollArea style={{ height: 812 }} offsetScrollbars>
+            <ScrollArea style={{ height: "calc(100vh - 247px)" }} offsetScrollbars>
               {fetching ? (
                 <Skeleton height={36} radius="sm" />
               ) : (
@@ -274,7 +274,7 @@ const TasksBoard = ({ taskData, fetching }: TasksProps) => {
         {StatusBoardEnable(TaskStatus.Canceled) && (
           <Stack spacing={0} sx={{ minWidth: 312 }}>
             <Counter status={TaskStatus.Canceled} fetching={fetching} />
-            <ScrollArea style={{ height: 812 }} offsetScrollbars>
+            <ScrollArea style={{ height: "calc(100vh - 247px)" }} offsetScrollbars>
               {fetching ? (
                 <Skeleton height={36} radius="sm" />
               ) : (

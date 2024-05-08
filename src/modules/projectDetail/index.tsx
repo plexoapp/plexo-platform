@@ -104,9 +104,9 @@ const ProjectDetailContent = ({ project, isLoading }: ProjectDetailProps) => {
   };
 
   return (
-    <Group p={"md"} sx={{ alignItems: "baseline" }}>
-      <ScrollArea offsetScrollbars type="hover" sx={{ flex: 1, height: "calc(100vh - 109px)" }}>
-        <Stack m={"auto"} maw={860}>
+    <Group sx={{ alignItems: "baseline" }}>
+      <ScrollArea offsetScrollbars type="hover" sx={{ flexGrow: 1, height: "calc(100vh - 110px)" }}>
+        <Stack mx={"auto"} maw={860}>
           <Stack spacing={10}>
             <Group position="apart" className={classes.headerSections}>
               {isLoading ? (
