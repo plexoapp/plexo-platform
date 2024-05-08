@@ -25,7 +25,13 @@ const TextMessage = ({ message }: { message: TextMessageProps }) => {
           alignSelf: `${message.role == "assistant" ? "flex-start" : "flex-end"}`,
         }}
       >
-        <Text fz={"sm"} color={theme.colorScheme === "dark" ? "white" : theme.colors.dark[6]}>
+        <Text
+          fz={"sm"}
+          color={theme.colorScheme === "dark" ? "white" : theme.colors.dark[6]}
+          sx={{
+            wordWrap: "break-word",
+          }}
+        >
           {message.message}
         </Text>
       </Paper>
