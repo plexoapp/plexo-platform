@@ -24,8 +24,26 @@
 ## Plexo
 ## Features
 ## Usage
-## Contributing
+## Contribution
+
+We welcome all contributions to the Plexo project! Whether you're interested in fixing bugs, adding new features, or improving documentation, your input is greatly valued.
+
+
 ## Contributors
+
+
+[//]: contributor-faces
+<a href="https://github.com/bregydoc"><img src="https://avatars.githubusercontent.com/u/18302365?s=96&v=4" title="yuval-hazaz" width="40" height="40"></a>
+<a href="https://github.com/annalbirena"><img src="https://avatars.githubusercontent.com/u/30696989?v=4" title="yuval-hazaz" width="40" height="40"></a>
+<a href="https://github.com/Julianqll"><img src="https://avatars.githubusercontent.com/u/64666002?s=96&v=4" title="yuval-hazaz" width="40" height="40"></a>
+<a href="https://github.com/AlvaroZev"><img src="https://avatars.githubusercontent.com/u/62489050?s=96&v=4" title="yuval-hazaz" width="40" height="40"></a>
+<a href="https://github.com/mariagnoriegag"><img src="https://avatars.githubusercontent.com/u/25857636?v=4" title="yuval-hazaz" width="40" height="40"></a>
+<a href="https://github.com/VktorR"><img src="https://avatars.githubusercontent.com/u/134090955?v=4" title="yuval-hazaz" width="40" height="40"></a>
+<a href="https://github.com/juan4056"><img src="https://avatars.githubusercontent.com/u/38072704?s=96&v=4" title="yuval-hazaz" width="40" height="40"></a>
+<a href="https://github.com/eltruforce"><img src="https://avatars.githubusercontent.com/u/101885013?s=96&v=4" title="yuval-hazaz" width="40" height="40"></a>
+
+[//]: contributor-faces
+
 ## License
 
 
