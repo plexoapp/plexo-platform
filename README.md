@@ -22,15 +22,42 @@
 ![Demo (1)](https://github.com/plexoapp/plexo-platform/assets/30696989/45603923-5420-49e5-8fe2-59618b3b099c)
 
 ## Plexo
+
+Plexo is an innovative, open-source project management platform that harnesses the power of AI to streamline the way you work. Designed to simplify task tracking within projects and teams, Plexo cuts through the complexities of traditional project management, replacing them with intuitive and efficient solutions.
+
+Plexo's advanced AI functionalities are the heart of the platform. The AI autonomously generates tasks necessary for project completion, taking into account the project's requirements, deadlines, and the team's capabilities, and also provides a user-friendly chat feature that enables you to converse with an AI assistant in natural language. These features empower a streamlined planning process, freeing your team to focus on core work while ensuring improved access to information.
+
+Adopt Plexo to enhance your software project planning and elevate team synergy.
+
 ## Features
+
+- 🧠 **AI-Powered Suggestions**: Plexo provides intelligent suggestions to aid in project planning and task management.
+
+- 💬 **AI-Powered Chat**:  Converse with Plexo's AI assistant in natural language to ask questions, clarify task details, and gain real-time project insights.
+  
+- 📈 **Active Task Tracking**: Follow the progress of tasks/issues in real-time within a project, team, or individual context.
+
+- 🤖 **Autonomous Task Creation**: Plexo can autonomously generate tasks necessary for project completion, optimizing the planning process.
+
+- 🤝 **Seamless Collaboration**: Plexo facilitates collaboration between team members, streamlining communication and increasing efficiency.
+
+- 🔓 **Open-Source and Free Forever**: Plexo is committed to remaining an open-source project, fostering a community of contributors and users.
+
+- 🍃 **Lightweight and Self-Hosted**: Plexo is designed to be lightweight and self-hostable, reducing dependencies and providing flexibility.
+  
+- 🎨 **Personalized UI**: Plexo offers a customizable interface, featuring light/dark modes, list/board views, and advanced filters.
+
 ## Usage
+
+To get started with Plexo and unlock its powerful features, see this video that guides you through the essential steps of using Plexo.
+
+- [Demo Video](https://www.youtube.com/watch?v=vL1rva6Pu5g)
+
 ## Contribution
 
 We welcome all contributions to the Plexo project! Whether you're interested in fixing bugs, adding new features, or improving documentation, your input is greatly valued.
 
-
 ## Contributors
-
 
 [//]: contributor-faces
 <a href="https://github.com/bregydoc"><img src="https://avatars.githubusercontent.com/u/18302365?s=96&v=4" title="bregydoc" width="40" height="40"></a>
